@@ -58,16 +58,17 @@ private:
 	float normalSpeed;
 	float fasterSpeed;
 
-protected:
+	float frictionCoefficient;
+	void AddFriction(float DeltaTime);
 
+	float jumpMaxHoldTime;
+
+protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
 	void StartRun();
 	void EndRun();
-
-	void StartJump();
-	void EndJump();
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);

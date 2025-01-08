@@ -16,7 +16,8 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 //////////////////////////////////////////////////////////////////////////
 // AMoveCharacter
 
-AProjectWaterCharacter::AProjectWaterCharacter() : normalSpeed(500.0f), fasterSpeed(750.0f)
+AProjectWaterCharacter::AProjectWaterCharacter()
+	: normalSpeed(500.0f), fasterSpeed(750.0f), frictionCoefficient(1.5f), jumpMaxHoldTime(0.25f)
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -32,7 +33,7 @@ AProjectWaterCharacter::AProjectWaterCharacter() : normalSpeed(500.0f), fasterSp
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
-	GetCharacterMovement()->JumpZVelocity = 700.f;
+	//GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = normalSpeed;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
@@ -55,6 +56,8 @@ AProjectWaterCharacter::AProjectWaterCharacter() : normalSpeed(500.0f), fasterSp
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	JumpMaxHoldTime = jumpMaxHoldTime;
 }
 
 void AProjectWaterCharacter::BeginPlay()
@@ -67,12 +70,17 @@ void AProjectWaterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	AddFriction(DeltaTime);
+}
+
+void AProjectWaterCharacter::AddFriction(float DeltaTime)
+{
 	FVector currentVelocity = GetCharacterMovement()->Velocity;
 	FVector horizontalVelocity = FVector(currentVelocity.X, currentVelocity.Y, 0.0f);
 	float speed = horizontalVelocity.Size();
 
 	float friction = FMath::Lerp(5.0f, 1.0f, FMath::Clamp(speed / normalSpeed, 0.0f, 1.0f));
-	FVector deceleration = -horizontalVelocity.GetSafeNormal() * friction * normalSpeed * 1.5f;
+	FVector deceleration = -horizontalVelocity.GetSafeNormal() * friction * frictionCoefficient * normalSpeed;
 
 	if (FMath::IsNearlyZero(MoveActionBinding->GetValue().Get<FVector2D>().X) &&
 		FMath::IsNearlyZero(MoveActionBinding->GetValue().Get<FVector2D>().Y))
@@ -164,14 +172,6 @@ void AProjectWaterCharacter::EndRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = normalSpeed;
 	//UE_LOG(LogTemp, Log, TEXT("end dash"));
-}
-
-void AProjectWaterCharacter::StartJump()
-{
-}
-
-void AProjectWaterCharacter::EndJump()
-{
 }
 
 void AProjectWaterCharacter::Look(const FInputActionValue& Value)
