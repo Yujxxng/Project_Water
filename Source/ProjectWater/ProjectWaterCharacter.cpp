@@ -157,13 +157,13 @@ void AProjectWaterCharacter::Move(const FInputActionValue& Value)
 void AProjectWaterCharacter::StartRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = fasterSpeed;
-	//UE_LOG(LogTemp, Log, TEXT("start dash"));
+	UE_LOG(LogTemp, Log, TEXT("start dash"));
 }
 
 void AProjectWaterCharacter::EndRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = normalSpeed;
-	//UE_LOG(LogTemp, Log, TEXT("end dash"));
+	UE_LOG(LogTemp, Log, TEXT("end dash"));
 }
 
 void AProjectWaterCharacter::StartJump()
