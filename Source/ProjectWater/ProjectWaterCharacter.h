@@ -58,6 +58,8 @@ private:
 	float normalSpeed;
 	float fasterSpeed;
 
+	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
+
 	float frictionCoefficient;
 	void AddFriction(float DeltaTime);
 

@@ -33,11 +33,9 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
-	//GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = normalSpeed;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
-	//GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
 	GetCharacterMovement()->BrakingDecelerationWalking = 0.0f;
@@ -71,6 +69,31 @@ void AProjectWaterCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	AddFriction(DeltaTime);
+
+	//UE_LOG(LogTemp, Log, TEXT("movement mode :: %d"), GetCharacterMovement()->MovementMode);
+
+	if (GetCharacterMovement()->MovementMode == MOVE_Flying)
+	{
+		//UE_LOG(LogTemp, Log, TEXT("movement mode :: %f"), GetCharacterMovement()->GravityScale);
+		GetCharacterMovement()->Velocity.Z -= GetCharacterMovement()->GravityScale;
+	}
+}
+
+void AProjectWaterCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
+{
+	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
+
+	if (GetCharacterMovement()->MovementMode == MOVE_Walking)
+	{
+		GetCharacterMovement()->AirControl = 0.35f;
+		GetCharacterMovement()->MaxWalkSpeed = normalSpeed;
+		GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
+		GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
+
+		GetCharacterMovement()->BrakingDecelerationWalking = 0.0f;
+
+		JumpMaxHoldTime = jumpMaxHoldTime;
+	}
 }
 
 void AProjectWaterCharacter::AddFriction(float DeltaTime)
@@ -165,12 +188,14 @@ void AProjectWaterCharacter::Move(const FInputActionValue& Value)
 void AProjectWaterCharacter::StartRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = fasterSpeed;
+	GetCharacterMovement()->MaxFlySpeed = fasterSpeed;
 	//UE_LOG(LogTemp, Log, TEXT("start dash"));
 }
 
 void AProjectWaterCharacter::EndRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = normalSpeed;
+	GetCharacterMovement()->MaxFlySpeed = normalSpeed;
 	//UE_LOG(LogTemp, Log, TEXT("end dash"));
 }
 
