@@ -75,7 +75,7 @@ void AProjectWaterCharacter::Tick(float DeltaTime)
 	if (GetCharacterMovement()->MovementMode == MOVE_Flying)
 	{
 		//UE_LOG(LogTemp, Log, TEXT("movement mode :: %f"), GetCharacterMovement()->GravityScale);
-		GetCharacterMovement()->Velocity.Z -= GetCharacterMovement()->GravityScale;
+		//GetCharacterMovement()->Velocity.Z -= GetCharacterMovement()->GravityScale;
 	}
 }
 
@@ -153,6 +153,10 @@ void AProjectWaterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 		MoveActionBinding = &EnhancedInputComponent->BindActionValue(MoveAction);
 
+		// Flying
+		EnhancedInputComponent->BindAction(FlyUpAction, ETriggerEvent::Started, this, &AProjectWaterCharacter::StartFlyUp);
+		EnhancedInputComponent->BindAction(FlyUpAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::FlyUp);
+
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::Look);
 	}
@@ -197,6 +201,29 @@ void AProjectWaterCharacter::EndRun()
 	GetCharacterMovement()->MaxWalkSpeed = normalSpeed;
 	GetCharacterMovement()->MaxFlySpeed = normalSpeed;
 	//UE_LOG(LogTemp, Log, TEXT("end dash"));
+}
+
+void AProjectWaterCharacter::StartFlyUp()
+{
+	static FVector flyup{ 0, 0, 1000000000.f };
+	if (GetCharacterMovement()->MovementMode == MOVE_Flying)
+	{
+		UE_LOG(LogTemp, Log, TEXT("start fly up"));
+
+		GetCharacterMovement()->AddImpulse(flyup, true);
+
+	}
+}
+
+void AProjectWaterCharacter::FlyUp()
+{
+	static FVector flyup{ 0, 0, 100.f };
+	if (GetCharacterMovement()->MovementMode == MOVE_Flying)
+	{
+		UE_LOG(LogTemp, Log, TEXT("fly up"));
+
+		//GetCharacterMovement()->AddImpulse(flyup);
+	}
 }
 
 void AProjectWaterCharacter::Look(const FInputActionValue& Value)
