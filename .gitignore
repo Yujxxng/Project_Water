@@ -93,3 +93,5 @@ Content/__ExternalObjects__/
 *.suo
 *.xcodeproj
 *.xcworkspace
+StarterContent/
+Fab/
