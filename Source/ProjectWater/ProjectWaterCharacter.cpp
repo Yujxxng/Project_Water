@@ -16,7 +16,8 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 //////////////////////////////////////////////////////////////////////////
 // AMoveCharacter
 
-AProjectWaterCharacter::AProjectWaterCharacter() : normalSpeed(500.0f), fasterSpeed(750.0f)
+AProjectWaterCharacter::AProjectWaterCharacter()
+	: normalSpeed(500.0f), fasterSpeed(750.0f), frictionCoefficient(1.5f), jumpMaxHoldTime(0.25f)
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -32,11 +33,9 @@ AProjectWaterCharacter::AProjectWaterCharacter() : normalSpeed(500.0f), fasterSp
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
 	// instead of recompiling to adjust them
-	GetCharacterMovement()->JumpZVelocity = 700.f;
 	GetCharacterMovement()->AirControl = 0.35f;
 	GetCharacterMovement()->MaxWalkSpeed = normalSpeed;
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
-	//GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
 	GetCharacterMovement()->BrakingDecelerationWalking = 0.0f;
@@ -55,6 +54,8 @@ AProjectWaterCharacter::AProjectWaterCharacter() : normalSpeed(500.0f), fasterSp
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	JumpMaxHoldTime = jumpMaxHoldTime;
 }
 
 void AProjectWaterCharacter::BeginPlay()
@@ -67,12 +68,42 @@ void AProjectWaterCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	AddFriction(DeltaTime);
+
+	//UE_LOG(LogTemp, Log, TEXT("movement mode :: %d"), GetCharacterMovement()->MovementMode);
+
+	if (GetCharacterMovement()->MovementMode == MOVE_Flying)
+	{
+		//UE_LOG(LogTemp, Log, TEXT("movement mode :: %f"), GetCharacterMovement()->GravityScale);
+		GetCharacterMovement()->Velocity.Z -= GetCharacterMovement()->GravityScale;
+	}
+}
+
+void AProjectWaterCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
+{
+	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
+
+	if (GetCharacterMovement()->MovementMode == MOVE_Walking)
+	{
+		GetCharacterMovement()->AirControl = 0.35f;
+		GetCharacterMovement()->MaxWalkSpeed = normalSpeed;
+		GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
+		GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
+
+		GetCharacterMovement()->BrakingDecelerationWalking = 0.0f;
+
+		JumpMaxHoldTime = jumpMaxHoldTime;
+	}
+}
+
+void AProjectWaterCharacter::AddFriction(float DeltaTime)
+{
 	FVector currentVelocity = GetCharacterMovement()->Velocity;
 	FVector horizontalVelocity = FVector(currentVelocity.X, currentVelocity.Y, 0.0f);
 	float speed = horizontalVelocity.Size();
 
 	float friction = FMath::Lerp(5.0f, 1.0f, FMath::Clamp(speed / normalSpeed, 0.0f, 1.0f));
-	FVector deceleration = -horizontalVelocity.GetSafeNormal() * friction * normalSpeed * 1.5f;
+	FVector deceleration = -horizontalVelocity.GetSafeNormal() * friction * frictionCoefficient * normalSpeed;
 
 	if (FMath::IsNearlyZero(MoveActionBinding->GetValue().Get<FVector2D>().X) &&
 		FMath::IsNearlyZero(MoveActionBinding->GetValue().Get<FVector2D>().Y))
@@ -122,6 +153,10 @@ void AProjectWaterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 		MoveActionBinding = &EnhancedInputComponent->BindActionValue(MoveAction);
 
+		// Flying
+		EnhancedInputComponent->BindAction(FlyUpAction, ETriggerEvent::Started, this, &AProjectWaterCharacter::StartFlyUp);
+		EnhancedInputComponent->BindAction(FlyUpAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::FlyUp);
+
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::Look);
 	}
@@ -157,21 +192,38 @@ void AProjectWaterCharacter::Move(const FInputActionValue& Value)
 void AProjectWaterCharacter::StartRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = fasterSpeed;
+	GetCharacterMovement()->MaxFlySpeed = fasterSpeed;
 	//UE_LOG(LogTemp, Log, TEXT("start dash"));
 }
 
 void AProjectWaterCharacter::EndRun()
 {
 	GetCharacterMovement()->MaxWalkSpeed = normalSpeed;
+	GetCharacterMovement()->MaxFlySpeed = normalSpeed;
 	//UE_LOG(LogTemp, Log, TEXT("end dash"));
 }
 
-void AProjectWaterCharacter::StartJump()
+void AProjectWaterCharacter::StartFlyUp()
 {
+	static FVector flyup{ 0, 0, 1000000000.f };
+	if (GetCharacterMovement()->MovementMode == MOVE_Flying)
+	{
+		UE_LOG(LogTemp, Log, TEXT("start fly up"));
+
+		//GetCharacterMovement()->AddImpulse(flyup, true);
+
+	}
 }
 
-void AProjectWaterCharacter::EndJump()
+void AProjectWaterCharacter::FlyUp()
 {
+	static FVector flyup{ 0, 0, 100.f };
+	if (GetCharacterMovement()->MovementMode == MOVE_Flying)
+	{
+		UE_LOG(LogTemp, Log, TEXT("fly up"));
+
+		//GetCharacterMovement()->AddImpulse(flyup);
+	}
 }
 
 void AProjectWaterCharacter::Look(const FInputActionValue& Value)

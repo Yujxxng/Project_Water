@@ -42,9 +42,13 @@ class AProjectWaterCharacter : public ACharacter
 
 	struct FEnhancedInputActionValueBinding* MoveActionBinding;
 
-	/** Dash Input Action */
+	/** Run Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* RunAction;
+
+	/** FlyUp Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* FlyUpAction;
 
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
@@ -58,16 +62,22 @@ private:
 	float normalSpeed;
 	float fasterSpeed;
 
-protected:
+	float frictionCoefficient;
+	void AddFriction(float DeltaTime);
 
+	float jumpMaxHoldTime;
+
+	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
+
+protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
 	void StartRun();
 	void EndRun();
 
-	void StartJump();
-	void EndJump();
+	void StartFlyUp();
+	void FlyUp();
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
