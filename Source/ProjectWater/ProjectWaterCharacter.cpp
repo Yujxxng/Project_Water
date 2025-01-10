@@ -17,7 +17,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 // AMoveCharacter
 
 AProjectWaterCharacter::AProjectWaterCharacter()
-	: normalSpeed(500.0f), fasterSpeed(750.0f), frictionCoefficient(1.5f), jumpMaxHoldTime(0.25f)
+	: normalSpeed(500.0f), fasterSpeed(750.0f), jumpMaxHoldTime(0.25f)
 {
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -38,7 +38,7 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
-	GetCharacterMovement()->BrakingDecelerationWalking = 0.0f;
+	GetCharacterMovement()->BrakingDecelerationWalking = 2000.0f;
 	//GetCharacterMovement()->GroundFriction = 0.0f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
@@ -79,6 +79,24 @@ void AProjectWaterCharacter::Tick(float DeltaTime)
 	}
 }
 
+void AProjectWaterCharacter::ChangeCharacterPhase(ECharacterPhase newPhase)
+{
+	if (characterPhase == newPhase)
+		return;
+
+	characterPhase = newPhase;
+	switch (newPhase)
+	{
+	case ECharacterPhase::HUMAN_PHASE:
+		GetCharacterMovement()->BrakingDecelerationWalking = 2000.0f;
+		GetCharacterMovement()->GroundFriction = 8.0f;
+
+	case ECharacterPhase::ICE_PHASE:
+		GetCharacterMovement()->BrakingDecelerationWalking = 0.0f;
+		GetCharacterMovement()->GroundFriction = 0.0f;
+	}
+}
+
 void AProjectWaterCharacter::OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode)
 {
 	Super::OnMovementModeChanged(PrevMovementMode, PreviousCustomMode);
@@ -90,7 +108,7 @@ void AProjectWaterCharacter::OnMovementModeChanged(EMovementMode PrevMovementMod
 		GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 		GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
-		GetCharacterMovement()->BrakingDecelerationWalking = 0.0f;
+		//GetCharacterMovement()->BrakingDecelerationWalking = 0.0f;
 
 		JumpMaxHoldTime = jumpMaxHoldTime;
 	}
@@ -98,12 +116,15 @@ void AProjectWaterCharacter::OnMovementModeChanged(EMovementMode PrevMovementMod
 
 void AProjectWaterCharacter::AddFriction(float DeltaTime)
 {
+	if (characterPhase != ECharacterPhase::ICE_PHASE)
+		return;
+
 	FVector currentVelocity = GetCharacterMovement()->Velocity;
 	FVector horizontalVelocity = FVector(currentVelocity.X, currentVelocity.Y, 0.0f);
 	float speed = horizontalVelocity.Size();
 
-	float friction = FMath::Lerp(5.0f, 1.0f, FMath::Clamp(speed / normalSpeed, 0.0f, 1.0f));
-	FVector deceleration = -horizontalVelocity.GetSafeNormal() * friction * frictionCoefficient * normalSpeed;
+	float friction = FMath::Lerp(0.2f, 0.05f, FMath::Clamp(speed / normalSpeed, 0.0f, 1.0f));
+	FVector deceleration = -horizontalVelocity.GetSafeNormal() * friction * normalSpeed;
 
 	if (FMath::IsNearlyZero(MoveActionBinding->GetValue().Get<FVector2D>().X) &&
 		FMath::IsNearlyZero(MoveActionBinding->GetValue().Get<FVector2D>().Y))
@@ -111,7 +132,7 @@ void AProjectWaterCharacter::AddFriction(float DeltaTime)
 		horizontalVelocity += deceleration * DeltaTime;
 		//UE_LOG(LogTemp, Log, TEXT("velocity size :: %f"), GetCharacterMovement()->Velocity.Size());
 
-		if (GetCharacterMovement()->Velocity.Size() < 200.0f)
+		if (GetCharacterMovement()->Velocity.Size() < 50.0f)
 		{
 			horizontalVelocity = FVector::ZeroVector;
 		}

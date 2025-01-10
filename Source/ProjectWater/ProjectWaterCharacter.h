@@ -13,6 +13,15 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 
+UENUM(BlueprintType)
+enum class ECharacterPhase : uint8
+{
+	HUMAN_PHASE	UMETA(DisplayName = "Human phase"),
+	WATER_PHASE	UMETA(DisplayName = "Water phase"),
+	VAPOR_PHASE	UMETA(DisplayName = "Vapor phase"),
+	ICE_PHASE	UMETA(DisplayName = "Ice phase")
+};
+
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config = Game)
@@ -62,7 +71,6 @@ private:
 	float normalSpeed;
 	float fasterSpeed;
 
-	float frictionCoefficient;
 	void AddFriction(float DeltaTime);
 
 	float jumpMaxHoldTime;
@@ -97,5 +105,21 @@ public:
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+
+
+
+
+
+
+
+
+
+public:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	ECharacterPhase characterPhase;
+
+	UFUNCTION(BlueprintCallable, Category = "Phase")
+	void ChangeCharacterPhase(ECharacterPhase newPhase);
 };
 
