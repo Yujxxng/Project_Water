@@ -75,7 +75,7 @@ void AProjectWaterCharacter::Tick(float DeltaTime)
 	if (GetCharacterMovement()->MovementMode == MOVE_Flying)
 	{
 		//UE_LOG(LogTemp, Log, TEXT("movement mode :: %f"), GetCharacterMovement()->GravityScale);
-		//GetCharacterMovement()->Velocity.Z -= GetCharacterMovement()->GravityScale;
+		GetCharacterMovement()->Velocity.Z -= GetCharacterMovement()->GravityScale;
 	}
 }
 
@@ -210,7 +210,7 @@ void AProjectWaterCharacter::StartFlyUp()
 	{
 		UE_LOG(LogTemp, Log, TEXT("start fly up"));
 
-		GetCharacterMovement()->AddImpulse(flyup, true);
+		//GetCharacterMovement()->AddImpulse(flyup, true);
 
 	}
 }
