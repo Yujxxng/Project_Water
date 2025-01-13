@@ -35,3 +35,9 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 		IsInteraction = Character->GetInteraction();
 	}
 }
+
+void UCharacterAnimInstance::AnimNotify_Attack()
+{
+	//UE_LOG(LogTemp, Log, TEXT("anim notify attack"));
+	Character->Attack();
+}

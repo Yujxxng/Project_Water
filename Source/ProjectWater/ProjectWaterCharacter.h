@@ -128,5 +128,7 @@ public:
 	bool HasTool() const { return curTool != nullptr; }
 
 	bool GetInteraction() const { return bInteraction; }
+
+	void Attack();
 };
 

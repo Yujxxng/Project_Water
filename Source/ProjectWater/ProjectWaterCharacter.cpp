@@ -11,6 +11,8 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 
+#include "Weapon.h"
+
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 //////////////////////////////////////////////////////////////////////////
@@ -18,7 +20,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 AProjectWaterCharacter::AProjectWaterCharacter()
 	: normalSpeed(500.0f), fasterSpeed(750.0f), jumpMaxHoldTime(0.25f)
-	, curTool(nullptr), bInteraction(false)
+	, bInteraction(false), curTool(nullptr)
 {
 	MovementComponent = GetCharacterMovement();
 
@@ -140,6 +142,17 @@ void AProjectWaterCharacter::NotifyActorBeginOverlap(AActor* OtherActor)
 		GetTool(OtherActor);
 		break;
 	}
+}
+
+void AProjectWaterCharacter::Attack()
+{
+	UE_LOG(LogTemp, Log, TEXT("attack"));
+
+	AWeapon* weapon = Cast<AWeapon>(curTool);
+	weapon->EnableCollision();
+
+	curTool->Destroy();
+	curTool = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -48,4 +48,8 @@ protected:
 
 	UPROPERTY(BlueprintReadOnly, Category = Movement)
 	bool IsInteraction;
+
+private:
+	UFUNCTION()
+	void AnimNotify_Attack();
 };
