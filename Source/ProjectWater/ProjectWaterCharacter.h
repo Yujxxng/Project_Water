@@ -83,8 +83,6 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
-	void SetInteraction();
-
 
 protected:
 	// APawn interface
@@ -117,6 +115,7 @@ private:
 	void SetCharacterPhase(ECharacterPhase newPhase);
 
 	bool bInteraction;
+	void SetInteraction();
 
 	AActor* curTool;
 	UFUNCTION(BlueprintCallable)

@@ -20,6 +20,9 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	: normalSpeed(500.0f), fasterSpeed(750.0f), jumpMaxHoldTime(0.25f)
 	, curTool(nullptr), bInteraction(false)
 {
+	MovementComponent = GetCharacterMovement();
+
+	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -54,8 +57,6 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
-
-	MovementComponent = GetCharacterMovement();
 
 	JumpMaxHoldTime = jumpMaxHoldTime;
 
@@ -126,6 +127,7 @@ void AProjectWaterCharacter::GetTool(AActor* tool)
 {
 	curTool = tool;
 	tool->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_r_socket"));
+
 }
 
 void AProjectWaterCharacter::NotifyActorBeginOverlap(AActor* OtherActor)
@@ -256,13 +258,4 @@ void AProjectWaterCharacter::Look(const FInputActionValue& Value)
 void AProjectWaterCharacter::SetInteraction()
 {
 	bInteraction = !bInteraction;
-
-	if (bInteraction)
-	{
-		UE_LOG(LogTemp, Log, TEXT("interaction true"));
-	}
-	else
-	{
-		UE_LOG(LogTemp, Log, TEXT("interaction false"));
-	}
 }
