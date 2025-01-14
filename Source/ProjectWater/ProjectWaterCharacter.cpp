@@ -271,3 +271,25 @@ void AProjectWaterCharacter::SetInteraction()
 {
 	bInteraction = !bInteraction;
 }
+
+void AProjectWaterCharacter::AnimNotify_Attack()
+{
+	//UE_LOG(LogTemp, Log, TEXT("anim notify attack"));
+
+	if (curTool)
+	{
+		AWeapon* weapon = Cast<AWeapon>(curTool);
+		weapon->EnableCollision();
+	}
+
+	Attack();
+}
+
+void AProjectWaterCharacter::AnimNotify_EndAttack()
+{
+	if (curTool)
+	{
+		AWeapon* weapon = Cast<AWeapon>(curTool);
+		weapon->DisableCollision();
+	}
+}

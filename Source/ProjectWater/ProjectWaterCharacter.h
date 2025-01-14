@@ -125,10 +125,15 @@ protected:
 
 public:
 	AActor* curTool;
+	UFUNCTION(BlueprintCallable)
 	bool HasTool() const { return curTool != nullptr; }
-
+	UFUNCTION(BlueprintCallable)
 	bool GetInteraction() const { return bInteraction; }
+	UFUNCTION(BlueprintCallable)
+	void AnimNotify_Attack();
 
+	UFUNCTION(BlueprintCallable)
+	void AnimNotify_EndAttack();
 	void Attack();
 };
 
