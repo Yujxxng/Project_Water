@@ -15,6 +15,15 @@ struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
+UENUM(BlueprintType)
+enum class ECharacterPhase : uint8
+{
+	HUMAN_PHASE	UMETA(DisplayName = "Human phase"),
+	WATER_PHASE	UMETA(DisplayName = "Water phase"),
+	VAPOR_PHASE	UMETA(DisplayName = "Vapor phase"),
+	ICE_PHASE	UMETA(DisplayName = "Ice phase")
+};
+
 UCLASS(config = Game)
 class AProjectWaterCharacter : public ACharacter
 {
@@ -40,8 +49,6 @@ class AProjectWaterCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
 
-	struct FEnhancedInputActionValueBinding* MoveActionBinding;
-
 	/** Run Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* RunAction;
@@ -54,22 +61,16 @@ class AProjectWaterCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	/** Look Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractionAction;
+
 public:
 	AProjectWaterCharacter();
 
 
-private:
-	float normalSpeed;
-	float fasterSpeed;
-
-	float frictionCoefficient;
-	void AddFriction(float DeltaTime);
-
-	float jumpMaxHoldTime;
-
-	virtual void OnMovementModeChanged(EMovementMode PrevMovementMode, uint8 PreviousCustomMode = 0) override;
-
 protected:
+
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
@@ -92,10 +93,42 @@ protected:
 
 	virtual void Tick(float DeltaTime) override;
 
+
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
+
+
+private:
+	TObjectPtr<UCharacterMovementComponent> MovementComponent;
+
+	float normalSpeed;
+	float fasterSpeed;
+
+	float jumpMaxHoldTime;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintSetter = SetCharacterPhase)
+	ECharacterPhase characterPhase;
+	UFUNCTION(BlueprintSetter)
+	void SetCharacterPhase(ECharacterPhase newPhase);
+
+	bool bInteraction;
+	void SetInteraction();
+
+	UFUNCTION(BlueprintCallable)
+	void GetTool(AActor* tool);
+
+protected:
+	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+
+public:
+	AActor* curTool;
+	bool HasTool() const { return curTool != nullptr; }
+
+	bool GetInteraction() const { return bInteraction; }
+
+	void Attack();
 };
 
