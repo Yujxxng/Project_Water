@@ -117,7 +117,6 @@ private:
 	bool bInteraction;
 	void SetInteraction();
 
-	AActor* curTool;
 	UFUNCTION(BlueprintCallable)
 	void GetTool(AActor* tool);
 
@@ -125,6 +124,7 @@ protected:
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
 public:
+	AActor* curTool;
 	bool HasTool() const { return curTool != nullptr; }
 
 	bool GetInteraction() const { return bInteraction; }

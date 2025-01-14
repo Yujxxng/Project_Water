@@ -146,13 +146,12 @@ void AProjectWaterCharacter::NotifyActorBeginOverlap(AActor* OtherActor)
 
 void AProjectWaterCharacter::Attack()
 {
-	UE_LOG(LogTemp, Log, TEXT("attack"));
+	UE_LOG(LogTemp, Log, TEXT("character attack"));
 
-	AWeapon* weapon = Cast<AWeapon>(curTool);
-	weapon->EnableCollision();
-
-	curTool->Destroy();
-	curTool = nullptr;
+	if (curTool && !IsValid(curTool))
+	{
+		curTool = nullptr;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

@@ -37,6 +37,7 @@ void AWeapon::OnWeaponOverlap(UPrimitiveComponent* OverlappedComp, AActor* Other
 	case ECollisionChannel::ECC_GameTraceChannel2:	// Breakable
 		UE_LOG(LogTemp, Log, TEXT("breakable destroy"));
 		OtherActor->Destroy();
+		this->Destroy();
 		break;
 	}
 }

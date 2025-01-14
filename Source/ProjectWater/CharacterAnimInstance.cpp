@@ -5,6 +5,8 @@
 #include "ProjectWaterCharacter.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+#include "Weapon.h"
+
 UCharacterAnimInstance::UCharacterAnimInstance()
 {
 }
@@ -39,5 +41,21 @@ void UCharacterAnimInstance::NativeUpdateAnimation(float DeltaTime)
 void UCharacterAnimInstance::AnimNotify_Attack()
 {
 	//UE_LOG(LogTemp, Log, TEXT("anim notify attack"));
+
+	if (Character->curTool)
+	{
+		AWeapon* weapon = Cast<AWeapon>(Character->curTool);
+		weapon->EnableCollision();
+	}
+
 	Character->Attack();
+}
+
+void UCharacterAnimInstance::AnimNotify_EndAttack()
+{
+	if (Character->curTool)
+	{
+		AWeapon* weapon = Cast<AWeapon>(Character->curTool);
+		weapon->DisableCollision();
+	}
 }

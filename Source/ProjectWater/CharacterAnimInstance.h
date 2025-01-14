@@ -52,4 +52,7 @@ protected:
 private:
 	UFUNCTION()
 	void AnimNotify_Attack();
+
+	UFUNCTION()
+	void AnimNotify_EndAttack();
 };
