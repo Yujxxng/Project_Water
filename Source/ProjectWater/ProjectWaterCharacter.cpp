@@ -146,7 +146,7 @@ void AProjectWaterCharacter::NotifyActorBeginOverlap(AActor* OtherActor)
 
 void AProjectWaterCharacter::Attack()
 {
-	UE_LOG(LogTemp, Log, TEXT("character attack"));
+	//UE_LOG(LogTemp, Log, TEXT("character attack"));
 
 	if (curTool && !IsValid(curTool))
 	{
@@ -182,16 +182,12 @@ void AProjectWaterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, this, &AProjectWaterCharacter::StartRun);
 		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AProjectWaterCharacter::EndRun);
 
-		// Flying
-		EnhancedInputComponent->BindAction(FlyUpAction, ETriggerEvent::Started, this, &AProjectWaterCharacter::StartFlyUp);
-		EnhancedInputComponent->BindAction(FlyUpAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::FlyUp);
-
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::Look);
 
 		// Interaction
-		EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Started, this, &AProjectWaterCharacter::SetInteraction);
-		EnhancedInputComponent->BindAction(InteractionAction, ETriggerEvent::Completed, this, &AProjectWaterCharacter::SetInteraction);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AProjectWaterCharacter::SetInteraction);
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &AProjectWaterCharacter::SetInteraction);
 	}
 	else
 	{
