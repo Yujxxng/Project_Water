@@ -53,17 +53,14 @@ class AProjectWaterCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* RunAction;
 
-	/** FlyUp Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* FlyUpAction;
-
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
-	/** Look Input Action */
+
+	/** Interact(yejin) Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* InteractionAction;
+	UInputAction* InteractAction;
 
 public:
 	AProjectWaterCharacter();
@@ -114,8 +111,8 @@ private:
 	UFUNCTION(BlueprintSetter)
 	void SetCharacterPhase(ECharacterPhase newPhase);
 
-	bool bInteraction;
-	void SetInteraction();
+	bool bInteract;
+	void SetInteract();
 
 	UFUNCTION(BlueprintCallable)
 	void GetTool(AActor* tool);
@@ -127,11 +124,12 @@ public:
 	AActor* curTool;
 	UFUNCTION(BlueprintCallable)
 	bool HasTool() const { return curTool != nullptr; }
+
 	UFUNCTION(BlueprintCallable)
-	bool GetInteraction() const { return bInteraction; }
+	bool GetInteract() const { return bInteract; }
+
 	UFUNCTION(BlueprintCallable)
 	void AnimNotify_Attack();
-
 	UFUNCTION(BlueprintCallable)
 	void AnimNotify_EndAttack();
 	void Attack();
