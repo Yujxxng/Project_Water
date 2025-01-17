@@ -129,18 +129,21 @@ void AProjectWaterCharacter::GetTool(AActor* tool)
 {
 	curTool = tool;
 	tool->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_r_socket"));
-
 }
 
 void AProjectWaterCharacter::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	ECollisionChannel collisionChannel{ OtherActor->GetComponentByClass<UStaticMeshComponent>()->GetCollisionObjectType() };
-
-	switch (collisionChannel)
+	UStaticMeshComponent* staticMeshComp = OtherActor->GetComponentByClass<UStaticMeshComponent>();
+	if(staticMeshComp)
 	{
-	case ECollisionChannel::ECC_GameTraceChannel1:	// TOOLS
-		GetTool(OtherActor);
-		break;
+		ECollisionChannel collisionChannel{ staticMeshComp->GetCollisionObjectType() };
+
+		switch (collisionChannel)
+		{
+		case ECollisionChannel::ECC_GameTraceChannel1:	// TOOLS
+			GetTool(OtherActor);
+			break;
+		}
 	}
 }
 
@@ -204,7 +207,7 @@ void AProjectWaterCharacter::Move(const FInputActionValue& Value)
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
-	if (Controller != nullptr)
+	if (Controller != nullptr && characterPhase != ECharacterPhase::WATER_PHASE)
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -225,14 +228,12 @@ void AProjectWaterCharacter::Move(const FInputActionValue& Value)
 void AProjectWaterCharacter::StartRun()
 {
 	MovementComponent->MaxWalkSpeed = fasterSpeed;
-	MovementComponent->MaxFlySpeed = fasterSpeed;
 	//UE_LOG(LogTemp, Log, TEXT("start dash"));
 }
 
 void AProjectWaterCharacter::EndRun()
 {
 	MovementComponent->MaxWalkSpeed = normalSpeed;
-	MovementComponent->MaxFlySpeed = normalSpeed;
 	//UE_LOG(LogTemp, Log, TEXT("end dash"));
 }
 

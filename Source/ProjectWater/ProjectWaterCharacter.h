@@ -124,6 +124,7 @@ protected:
 	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
 
 public:
+
 	AActor* curTool;
 	UFUNCTION(BlueprintCallable)
 	bool HasTool() const { return curTool != nullptr; }
