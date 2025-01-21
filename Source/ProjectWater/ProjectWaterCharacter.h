@@ -13,16 +13,9 @@ class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
 
-DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
+class UCharacterState;
 
-UENUM(BlueprintType)
-enum class ECharacterPhase : uint8
-{
-	HUMAN_PHASE	UMETA(DisplayName = "Human phase"),
-	WATER_PHASE	UMETA(DisplayName = "Water phase"),
-	VAPOR_PHASE	UMETA(DisplayName = "Vapor phase"),
-	ICE_PHASE	UMETA(DisplayName = "Ice phase")
-};
+DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config = Game)
 class AProjectWaterCharacter : public ACharacter
@@ -49,18 +42,9 @@ class AProjectWaterCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
 
-	/** Run Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* RunAction;
-
 	/** Look Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
-
-
-	/** Interact(yejin) Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* InteractAction;
 
 public:
 	AProjectWaterCharacter();
@@ -70,12 +54,6 @@ protected:
 
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
-
-	void StartRun();
-	void EndRun();
-
-	void StartFlyUp();
-	void FlyUp();
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
@@ -88,9 +66,6 @@ protected:
 	// To add mapping context
 	virtual void BeginPlay();
 
-	virtual void Tick(float DeltaTime) override;
-
-
 public:
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -98,40 +73,14 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 
+	//////////////////////////////////////////////////////////////////////////
+	// Custom
+
 private:
-	TObjectPtr<UCharacterMovementComponent> MovementComponent;
-
-	float normalSpeed;
-	float fasterSpeed;
-
-	float jumpMaxHoldTime;
-
-	UPROPERTY(VisibleDefaultsOnly, BlueprintSetter = SetCharacterPhase)
-	ECharacterPhase characterPhase;
-	UFUNCTION(BlueprintSetter)
-	void SetCharacterPhase(ECharacterPhase newPhase);
-
-	bool bInteract;
-	void SetInteract();
-
-	UFUNCTION(BlueprintCallable)
-	void GetTool(AActor* tool);
-
-protected:
-	virtual void NotifyActorBeginOverlap(AActor* OtherActor) override;
+	TObjectPtr<UCharacterMovementComponent> CMC;
 
 public:
-	AActor* curTool;
-	UFUNCTION(BlueprintCallable)
-	bool HasTool() const { return curTool != nullptr; }
-
-	UFUNCTION(BlueprintCallable)
-	bool GetInteract() const { return bInteract; }
-
-	UFUNCTION(BlueprintCallable)
-	void AnimNotify_Attack();
-	UFUNCTION(BlueprintCallable)
-	void AnimNotify_EndAttack();
-	void Attack();
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterState", meta = (AllowPrivateAccess = "true"))
+	UCharacterState* CharacterState;
 };
 

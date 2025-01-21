@@ -11,7 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 
-#include "Weapon.h"
+#include "CharacterState.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -19,12 +19,8 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 // AMoveCharacter
 
 AProjectWaterCharacter::AProjectWaterCharacter()
-	: normalSpeed(500.0f), fasterSpeed(750.0f), jumpMaxHoldTime(0.25f)
-	, bInteract(false), curTool(nullptr)
-{
-	MovementComponent = GetCharacterMovement();
-
-	
+	: CharacterState(nullptr)
+{	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -34,16 +30,11 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	bUseControllerRotationRoll = false;
 
 	// Configure character movement
-	MovementComponent->bOrientRotationToMovement = true; // Character moves in the direction of input...	
-	MovementComponent->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
+	CMC = GetCharacterMovement();
+	CMC->bOrientRotationToMovement = true; // Character moves in the direction of input...	
+	CMC->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
 
-	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
-	// instead of recompiling to adjust them
-	MovementComponent->AirControl = 0.35f;
-	MovementComponent->MaxWalkSpeed = normalSpeed;
-	MovementComponent->MinAnalogWalkSpeed = 20.f;
-	MovementComponent->BrakingDecelerationWalking = 2000.0f;
-	MovementComponent->BrakingDecelerationFalling = 1500.0f;
+	CMC->MinAnalogWalkSpeed = 20.f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -60,98 +51,19 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
 
-	JumpMaxHoldTime = jumpMaxHoldTime;
-
 	// Ignore collision with camera
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
+
+	// Create a character state
+	CharacterState = CreateDefaultSubobject<UCharacterState>(TEXT("CharacterState"));
+	JumpMaxHoldTime = 0.25f;
 }
 
 void AProjectWaterCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
-}
-
-void AProjectWaterCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	//UE_LOG(LogTemp, Log, TEXT("movement mode :: %d"), GetCharacterMovement()->MovementMode);
-
-	switch (characterPhase)
-	{
-	case ECharacterPhase::VAPOR_PHASE:
-		JumpMaxHoldTime = 5.f;
-		break;
-
-	default:
-		JumpMaxHoldTime = jumpMaxHoldTime;
-	}
-}
-
-void AProjectWaterCharacter::SetCharacterPhase(ECharacterPhase newPhase)
-{
-	if (characterPhase == newPhase)
-		return;
-
-	characterPhase = newPhase;
-
-	switch (newPhase)
-	{
-	case ECharacterPhase::HUMAN_PHASE:
-		MovementComponent->AirControl = 0.35f;
-		MovementComponent->BrakingDecelerationWalking = 2000.0f;
-		MovementComponent->GroundFriction = 8.0f;
-		MovementComponent->GravityScale = 1.75f;
-		MovementComponent->Mass = 100.f;
-		break;
-
-	case ECharacterPhase::VAPOR_PHASE:
-		MovementComponent->AirControl = 0.8f;
-		MovementComponent->BrakingDecelerationWalking = 2000.0f;
-		MovementComponent->GroundFriction = 8.0f;
-		MovementComponent->GravityScale = 0.25f;
-		MovementComponent->Mass = 5.f;
-		break;
-
-	case ECharacterPhase::ICE_PHASE:
-		MovementComponent->AirControl = 0.35f;
-		MovementComponent->BrakingDecelerationWalking = 0.0f;
-		MovementComponent->GroundFriction = 0.0f;
-		MovementComponent->GravityScale = 1.75f;
-		MovementComponent->Mass = 100.f;
-		break;
-	}
-}
-
-void AProjectWaterCharacter::GetTool(AActor* tool)
-{
-	curTool = tool;
-	tool->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, TEXT("hand_r_socket"));
-
-}
-
-void AProjectWaterCharacter::NotifyActorBeginOverlap(AActor* OtherActor)
-{
-	ECollisionChannel collisionChannel{ OtherActor->GetComponentByClass<UStaticMeshComponent>()->GetCollisionObjectType() };
-
-	switch (collisionChannel)
-	{
-	case ECollisionChannel::ECC_GameTraceChannel1:	// TOOLS
-		GetTool(OtherActor);
-		break;
-	}
-}
-
-void AProjectWaterCharacter::Attack()
-{
-	//UE_LOG(LogTemp, Log, TEXT("character attack"));
-
-	if (curTool && !IsValid(curTool))
-	{
-		curTool = nullptr;
-	}
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -178,16 +90,8 @@ void AProjectWaterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::Move);
 
-		// Running
-		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Started, this, &AProjectWaterCharacter::StartRun);
-		EnhancedInputComponent->BindAction(RunAction, ETriggerEvent::Completed, this, &AProjectWaterCharacter::EndRun);
-
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::Look);
-
-		// Interaction
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Started, this, &AProjectWaterCharacter::SetInteract);
-		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Completed, this, &AProjectWaterCharacter::SetInteract);
 	}
 	else
 	{
@@ -218,38 +122,6 @@ void AProjectWaterCharacter::Move(const FInputActionValue& Value)
 	}
 }
 
-void AProjectWaterCharacter::StartRun()
-{
-	MovementComponent->MaxWalkSpeed = fasterSpeed;
-	MovementComponent->MaxFlySpeed = fasterSpeed;
-	//UE_LOG(LogTemp, Log, TEXT("start dash"));
-}
-
-void AProjectWaterCharacter::EndRun()
-{
-	MovementComponent->MaxWalkSpeed = normalSpeed;
-	MovementComponent->MaxFlySpeed = normalSpeed;
-	//UE_LOG(LogTemp, Log, TEXT("end dash"));
-}
-
-void AProjectWaterCharacter::StartFlyUp()
-{
-	if (characterPhase == ECharacterPhase::VAPOR_PHASE)
-	{
-		UE_LOG(LogTemp, Log, TEXT("start fly up"));
-		MovementComponent->AddImpulse(GetActorForwardVector() * 100.f, true);
-	}
-}
-
-void AProjectWaterCharacter::FlyUp()
-{
-	if (characterPhase == ECharacterPhase::VAPOR_PHASE)
-	{
-		UE_LOG(LogTemp, Log, TEXT("fly up"));
-		//AddMovementInput(GetActorUpVector(), 1.0f);
-	}
-}
-
 void AProjectWaterCharacter::Look(const FInputActionValue& Value)
 {
 	// input is a Vector2D
@@ -260,32 +132,5 @@ void AProjectWaterCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
-	}
-}
-
-void AProjectWaterCharacter::SetInteract()
-{
-	bInteract = !bInteract;
-}
-
-void AProjectWaterCharacter::AnimNotify_Attack()
-{
-	//UE_LOG(LogTemp, Log, TEXT("anim notify attack"));
-
-	if (curTool)
-	{
-		AWeapon* weapon = Cast<AWeapon>(curTool);
-		weapon->EnableCollision();
-	}
-
-	Attack();
-}
-
-void AProjectWaterCharacter::AnimNotify_EndAttack()
-{
-	if (curTool)
-	{
-		AWeapon* weapon = Cast<AWeapon>(curTool);
-		weapon->DisableCollision();
 	}
 }
