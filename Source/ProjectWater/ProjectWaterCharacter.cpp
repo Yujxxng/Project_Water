@@ -134,14 +134,14 @@ void AProjectWaterCharacter::GetTool(AActor* tool)
 
 void AProjectWaterCharacter::NotifyActorBeginOverlap(AActor* OtherActor)
 {
-	ECollisionChannel collisionChannel{ OtherActor->GetComponentByClass<UStaticMeshComponent>()->GetCollisionObjectType() };
+	//ECollisionChannel collisionChannel{ OtherActor->GetComponentByClass<UStaticMeshComponent>()->GetCollisionObjectType() };
 
-	switch (collisionChannel)
-	{
-	case ECollisionChannel::ECC_GameTraceChannel1:	// TOOLS
-		GetTool(OtherActor);
-		break;
-	}
+	//switch (collisionChannel)
+	//{
+	//case ECollisionChannel::ECC_GameTraceChannel1:	// TOOLS
+	//	GetTool(OtherActor);
+	//	break;
+	//}
 }
 
 void AProjectWaterCharacter::Attack()
