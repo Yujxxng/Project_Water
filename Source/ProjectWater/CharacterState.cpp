@@ -4,12 +4,16 @@
 #include "CharacterState.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "ProjectWaterCharacter.h"
 
 // Sets default values for this component's properties
 UCharacterState::UCharacterState()
-	: MovementComponent(nullptr), State(EState::STATE_Human)
-	, Energy(100.f), EnergyRecovery(0.3f), EnergyUsage(0.2f)
+	: Owner(nullptr), MovementComponent(nullptr)
+	, State(EState::STATE_Human)
+	, MaxEnergy(100.f), Energy(MaxEnergy)
+	, EnergyRecovery(0.3f), EnergyUsage(0.2f)
 	, EnergyCheckInterval(200), EnergyTimerStart()
+	, bExhausted(false)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
@@ -24,8 +28,8 @@ void UCharacterState::BeginPlay()
 {
 	Super::BeginPlay();
 
-	ACharacter* owner = Cast<ACharacter>(GetOwner());
-	MovementComponent = owner->GetCharacterMovement();
+	Owner = Cast<AProjectWaterCharacter>(GetOwner<AProjectWaterCharacter>());
+	MovementComponent = Owner->GetCharacterMovement();
 }
 
 
@@ -50,24 +54,39 @@ void UCharacterState::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 	while (adder >= EnergyCheckInterval)
 	{
-		switch (State)
+		if (bExhausted || State == EState::STATE_Human)
 		{
-		case EState::STATE_Human:
 			Energy += EnergyRecovery;
-			break;
-
-		default:
+		}
+		else
+		{
 			Energy -= EnergyUsage;
 		}
-		UE_LOG(LogTemp, Log, TEXT("Energy %f"), Energy);
 
+		UE_LOG(LogTemp, Log, TEXT("Energy %f"), Energy);
 		adder -= EnergyCheckInterval;
+	}
+
+	static bool exhaustedDebuff = false;
+	if (bExhausted && Energy >= MaxEnergy)
+	{
+		Energy = MaxEnergy;
+		exhaustedDebuff = false;
+		bExhausted = false;
+	}
+
+	if (!exhaustedDebuff && bExhausted)
+	{
+		SetState(EState::STATE_Human);
+		MovementComponent->MaxWalkSpeed /= 2.f;
+
+		exhaustedDebuff = true;
 	}
 }
 
 void UCharacterState::SetState(EState newState)
 {
-	if (State == newState)
+	if (bExhausted || State == newState)
 	{
 		return;
 	}

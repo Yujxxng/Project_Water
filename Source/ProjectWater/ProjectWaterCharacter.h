@@ -79,8 +79,20 @@ public:
 private:
 	TObjectPtr<UCharacterMovementComponent> CMC;
 
+	int MaxHearts;
+	UPROPERTY(VisibleDefaultsOnly)
+	int Hearts;
+
 public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterState", meta = (AllowPrivateAccess = "true"))
 	UCharacterState* CharacterState;
+
+	UFUNCTION(BlueprintCallable)
+	int GetHearts() { return Hearts; }
+
+	UFUNCTION(BlueprintCallable)
+	void DamageHearts(int num);
+	UFUNCTION(BlueprintCallable)
+	void HealHearts(int num);
 };
 

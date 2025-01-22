@@ -8,6 +8,7 @@
 #include <chrono>
 #include "CharacterState.generated.h"
 
+class AProjectWaterCharacter;
 class UCharacterMovementComponent;
 
 UENUM(BlueprintType)
@@ -26,16 +27,20 @@ class PROJECTWATER_API UCharacterState : public UActorComponent
 {
 	GENERATED_BODY()
 
+	TObjectPtr< AProjectWaterCharacter> Owner;
 	TObjectPtr<UCharacterMovementComponent> MovementComponent;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetState, BlueprintSetter = SetState)
 	EState State;
 
+	float MaxEnergy;
 	float Energy;
 	/*const */float EnergyRecovery, EnergyUsage;
 
 	const std::chrono::duration<long, std::milli> EnergyCheckInterval;
 	std::chrono::system_clock::time_point EnergyTimerStart;
+
+	bool bExhausted;
 
 public:	
 	// Sets default values for this component's properties

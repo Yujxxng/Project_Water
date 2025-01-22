@@ -19,7 +19,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 // AMoveCharacter
 
 AProjectWaterCharacter::AProjectWaterCharacter()
-	: CharacterState(nullptr)
+	: CharacterState(nullptr), MaxHearts(3), Hearts(MaxHearts)
 {	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -64,6 +64,26 @@ void AProjectWaterCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+}
+
+void AProjectWaterCharacter::DamageHearts(int num = 1)
+{
+	Hearts -= num;
+
+	if (Hearts < 0)
+	{
+		// game over
+	}
+}
+
+void AProjectWaterCharacter::HealHearts(int num = 1)
+{
+	Hearts += num;
+
+	if (Hearts > MaxHearts)
+	{
+		Hearts = MaxHearts;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////
