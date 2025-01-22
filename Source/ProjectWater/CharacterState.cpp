@@ -106,9 +106,9 @@ void UCharacterState::SetState(EState newState)
 		MovementComponent->MaxWalkSpeed = 450.f;
 		MovementComponent->MaxAcceleration = 2000.f;
 		MovementComponent->BrakingDecelerationWalking = 1000.f;
-		MovementComponent->BrakingDecelerationFalling = 1000.f;
+		MovementComponent->BrakingDecelerationFalling = 500.f;
 		MovementComponent->AirControl = 0.7f;
-		MovementComponent->GravityScale = 1.f;
+		MovementComponent->GravityScale = 0.5f;
 		MovementComponent->JumpZVelocity = 600.f;
 		MovementComponent->Mass = 1.f;
 		break;
