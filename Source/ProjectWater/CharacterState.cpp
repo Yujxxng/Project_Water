@@ -67,20 +67,25 @@ void UCharacterState::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		adder -= EnergyCheckInterval;
 	}
 
-	static bool exhaustedDebuff = false;
+	if (!bExhausted && Energy <= 0.f)
+	{
+		Energy = 0.f;
+		SetState(EState::STATE_Human);
+		MovementComponent->MaxWalkSpeed *= 0.6f;
+		Owner->DamageHearts();
+
+		bExhausted = true;
+		EnergyRecovery = 0.6f;
+	}
+	
 	if (bExhausted && Energy >= MaxEnergy)
 	{
-		Energy = MaxEnergy;
-		exhaustedDebuff = false;
 		bExhausted = false;
-	}
+		EnergyRecovery = 0.3f;
 
-	if (!exhaustedDebuff && bExhausted)
-	{
+		Energy = MaxEnergy;
+		State = EState::STATE_None;
 		SetState(EState::STATE_Human);
-		MovementComponent->MaxWalkSpeed /= 2.f;
-
-		exhaustedDebuff = true;
 	}
 }
 

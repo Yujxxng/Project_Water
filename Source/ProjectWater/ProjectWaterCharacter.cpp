@@ -66,17 +66,17 @@ void AProjectWaterCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AProjectWaterCharacter::DamageHearts(int num = 1)
+void AProjectWaterCharacter::DamageHearts(int num)
 {
 	Hearts -= num;
 
 	if (Hearts < 0)
 	{
-		// game over
+		UE_LOG(LogTemp, Log, TEXT("!!!!! GAME OVER !!!!!"));
 	}
 }
 
-void AProjectWaterCharacter::HealHearts(int num = 1)
+void AProjectWaterCharacter::HealHearts(int num)
 {
 	Hearts += num;
 

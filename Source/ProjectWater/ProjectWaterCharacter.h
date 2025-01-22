@@ -91,8 +91,8 @@ public:
 	int GetHearts() { return Hearts; }
 
 	UFUNCTION(BlueprintCallable)
-	void DamageHearts(int num);
+	void DamageHearts(int num = 1);
 	UFUNCTION(BlueprintCallable)
-	void HealHearts(int num);
+	void HealHearts(int num = 1);
 };
 
