@@ -6,6 +6,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "ProjectWaterCharacter.h"
 
+#include "Kismet/GameplayStatics.h"
+
 // Sets default values for this component's properties
 UCharacterState::UCharacterState()
 	: Owner(nullptr), MovementComponent(nullptr)
@@ -72,7 +74,8 @@ void UCharacterState::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 		Energy = 0.f;
 		SetState(EState::STATE_Human);
 		MovementComponent->MaxWalkSpeed *= 0.6f;
-		Owner->DamageHearts();
+		//Owner->DamageHearts();
+		UGameplayStatics::ApplyDamage(Owner, 1.f, Owner->GetInstigatorController(), nullptr, NULL);
 
 		bExhausted = true;
 		EnergyRecovery = 0.6f;

@@ -90,9 +90,11 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetHearts() { return Hearts; }
 
-	UFUNCTION(BlueprintCallable)
-	void DamageHearts(int num = 1);
+	/*UFUNCTION(BlueprintCallable)
+	void DamageHearts(int num = 1);*/
 	UFUNCTION(BlueprintCallable)
 	void HealHearts(int num = 1);
+
+	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 };
 

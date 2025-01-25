@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 
 #include "CharacterState.h"
+#include "Engine/DamageEvents.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -66,15 +67,15 @@ void AProjectWaterCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AProjectWaterCharacter::DamageHearts(int num)
-{
-	Hearts -= num;
-
-	if (Hearts < 0)
-	{
-		UE_LOG(LogTemp, Log, TEXT("!!!!! GAME OVER !!!!!"));
-	}
-}
+//void AProjectWaterCharacter::DamageHearts(int num)
+//{
+//	Hearts -= num;
+//
+//	if (Hearts < 0)
+//	{
+//		UE_LOG(LogTemp, Log, TEXT("!!!!! GAME OVER !!!!!"));
+//	}
+//}
 
 void AProjectWaterCharacter::HealHearts(int num)
 {
@@ -84,6 +85,24 @@ void AProjectWaterCharacter::HealHearts(int num)
 	{
 		Hearts = MaxHearts;
 	}
+}
+
+float AProjectWaterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
+{
+	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
+
+	// PointDamage
+	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
+	{
+		Hearts -= int(damage);
+	}
+
+	if (Hearts < 0)
+	{
+		UE_LOG(LogTemp, Log, TEXT("!!!!! GAME OVER !!!!!"));
+	}
+
+	return damage;
 }
 
 //////////////////////////////////////////////////////////////////////////
