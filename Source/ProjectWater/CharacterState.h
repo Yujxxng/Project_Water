@@ -22,7 +22,7 @@ enum class EState : uint8
 	STATE_Max	UMETA(Hidden)
 };
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), BlueprintType )
 class PROJECTWATER_API UCharacterState : public UActorComponent
 {
 	GENERATED_BODY()

@@ -58,6 +58,7 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 
 	// Create a character state
 	CharacterState = CreateDefaultSubobject<UCharacterState>(TEXT("CharacterState"));
+
 	JumpMaxHoldTime = 0.25f;
 }
 
