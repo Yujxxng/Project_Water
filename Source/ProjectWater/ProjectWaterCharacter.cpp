@@ -20,10 +20,13 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 // AMoveCharacter
 
 AProjectWaterCharacter::AProjectWaterCharacter()
-	: CharacterState(nullptr), MaxHearts(3), Hearts(MaxHearts)
+	: CharacterState(nullptr)
+	, CapsuleCollision(nullptr), CapsuleHalfHeightInit(90.f), CapsuleHalfHeightJump(70.f)
+	, MaxHearts(3), Hearts(MaxHearts)
 {	
 	// Set size for collision capsule
-	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
+	CapsuleCollision = GetCapsuleComponent();
+	CapsuleCollision->InitCapsuleSize(35.f, CapsuleHalfHeightInit);
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
@@ -78,6 +81,20 @@ void AProjectWaterCharacter::BeginPlay()
 //	}
 //}
 
+void AProjectWaterCharacter::Jump()
+{
+	CapsuleCollision->SetCapsuleHalfHeight(CapsuleHalfHeightJump);
+
+	Super::Jump();
+}
+
+void AProjectWaterCharacter::StopJumping()
+{
+	Super::StopJumping();
+
+	CapsuleCollision->SetCapsuleHalfHeight(CapsuleHalfHeightInit);
+}
+
 void AProjectWaterCharacter::HealHearts(int num)
 {
 	Hearts += num;
@@ -124,8 +141,8 @@ void AProjectWaterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
 
 		// Jumping
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &AProjectWaterCharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &AProjectWaterCharacter::StopJumping);
 
 		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::Move);

@@ -79,11 +79,18 @@ public:
 private:
 	TObjectPtr<UCharacterMovementComponent> CMC;
 
+	TObjectPtr<UCapsuleComponent> CapsuleCollision;
+	float CapsuleHalfHeightInit;
+	float CapsuleHalfHeightJump;
+
 	int MaxHearts;
 	UPROPERTY(VisibleDefaultsOnly)
 	int Hearts;
 
 public:
+	virtual void Jump() override;
+	virtual void StopJumping() override;
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterState", meta = (AllowPrivateAccess = "true"))
 	UCharacterState* CharacterState;
 
