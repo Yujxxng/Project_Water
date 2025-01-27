@@ -95,7 +95,7 @@ public:
 	UCharacterState* CharacterState;
 
 	UFUNCTION(BlueprintCallable)
-	int GetHearts() { return Hearts; }
+	int GetHearts() const { return Hearts; }
 
 	/*UFUNCTION(BlueprintCallable)
 	void DamageHearts(int num = 1);*/

@@ -157,4 +157,3 @@ void UCharacterState::SetState(EState newState)
 	State = newState;
 	EnergyTimerStart = std::chrono::system_clock::now();
 }
-
