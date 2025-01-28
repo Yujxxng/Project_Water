@@ -20,13 +20,11 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 // AMoveCharacter
 
 AProjectWaterCharacter::AProjectWaterCharacter()
-	: CharacterState(nullptr)
-	, CapsuleCollision(nullptr), CapsuleHalfHeightInit(90.f), CapsuleHalfHeightJump(70.f)
+	: PreJumpVelocity()
 	, MaxHearts(3), Hearts(MaxHearts)
 {	
 	// Set size for collision capsule
-	CapsuleCollision = GetCapsuleComponent();
-	CapsuleCollision->InitCapsuleSize(35.f, CapsuleHalfHeightInit);
+	GetCapsuleComponent()->InitCapsuleSize(35.f, 90.f);
 
 	// Don't rotate when the controller rotates. Let that just affect the camera.
 	bUseControllerRotationPitch = false;
@@ -39,6 +37,7 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	CMC->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
 
 	CMC->MinAnalogWalkSpeed = 20.f;
+	CMC->JumpZVelocity = 750.f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -61,12 +60,12 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 
 	// Create a character state
 	CharacterState = CreateDefaultSubobject<UCharacterState>(TEXT("CharacterState"));
-
-	JumpMaxHoldTime = 0.25f;
 }
 
 void AProjectWaterCharacter::BeginPlay()
 {
+	JumpMaxHoldTime = 0.f;
+
 	// Call the base class  
 	Super::BeginPlay();
 }
@@ -83,7 +82,13 @@ void AProjectWaterCharacter::BeginPlay()
 
 void AProjectWaterCharacter::Jump()
 {
-	CapsuleCollision->SetCapsuleHalfHeight(CapsuleHalfHeightJump);
+	PreJumpVelocity = CMC->Velocity;
+	PreJumpVelocity.Z = 0.f;
+	if (PreJumpVelocity.X > 0.1f || PreJumpVelocity.Y > 0.1f)
+	{
+		PreJumpVelocity.Z = CMC->JumpZVelocity;
+		CMC->JumpZVelocity *= 1.2f;
+	}
 
 	Super::Jump();
 }
@@ -92,7 +97,13 @@ void AProjectWaterCharacter::StopJumping()
 {
 	Super::StopJumping();
 
-	CapsuleCollision->SetCapsuleHalfHeight(CapsuleHalfHeightInit);
+	CMC->Velocity.X = PreJumpVelocity.X * 0.5f;
+	CMC->Velocity.Y = PreJumpVelocity.Y * 0.5f;
+
+	if (PreJumpVelocity.Z >= 0.00001f)
+	{
+		CMC->JumpZVelocity = PreJumpVelocity.Z;
+	}
 }
 
 void AProjectWaterCharacter::HealHearts(int num)

@@ -79,9 +79,7 @@ public:
 private:
 	TObjectPtr<UCharacterMovementComponent> CMC;
 
-	TObjectPtr<UCapsuleComponent> CapsuleCollision;
-	float CapsuleHalfHeightInit;
-	float CapsuleHalfHeightJump;
+	FVector PreJumpVelocity;
 
 	int MaxHearts;
 	UPROPERTY(VisibleDefaultsOnly)
