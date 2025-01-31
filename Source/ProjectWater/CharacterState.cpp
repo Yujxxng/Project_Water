@@ -108,9 +108,8 @@ void UCharacterState::SetState(EState newState)
 		MovementComponent->MaxAcceleration = 2000.f;
 		MovementComponent->BrakingDecelerationWalking = 2000.f;
 		MovementComponent->BrakingDecelerationFalling = 1500.f;
-		MovementComponent->AirControl = 0.8f;
+		MovementComponent->AirControl = 0.4f;
 		MovementComponent->GravityScale = 1.75f;
-		MovementComponent->JumpZVelocity = 420.f;
 		MovementComponent->Mass = 100.f;
 		break;
 
@@ -121,10 +120,9 @@ void UCharacterState::SetState(EState newState)
 		MovementComponent->MaxAcceleration = 500.f;
 		MovementComponent->BrakingDecelerationWalking = 1500.f;
 		MovementComponent->BrakingDecelerationFalling = 1500.f;
-		MovementComponent->AirControl = 0.6f;
+		MovementComponent->AirControl = 0.3f;
 		MovementComponent->GravityScale = 1.75f;
-		MovementComponent->JumpZVelocity = 300.f;
-		MovementComponent->Mass = 125.f;
+		MovementComponent->Mass = 100.f;
 		break;
 
 	case EState::STATE_Vapor:
@@ -136,7 +134,6 @@ void UCharacterState::SetState(EState newState)
 		MovementComponent->BrakingDecelerationFalling = 200.f;
 		MovementComponent->AirControl = 1.f;
 		MovementComponent->GravityScale = 0.5f;
-		MovementComponent->JumpZVelocity = 600.f;
 		MovementComponent->Mass = 1.f;
 		break;
 
@@ -147,10 +144,9 @@ void UCharacterState::SetState(EState newState)
 		MovementComponent->MaxAcceleration = 500.f;
 		MovementComponent->BrakingDecelerationWalking = 100.f;
 		MovementComponent->BrakingDecelerationFalling = 1500.f;
-		MovementComponent->AirControl = 0.6f;
+		MovementComponent->AirControl = 0.3f;
 		MovementComponent->GravityScale = 1.75f;
-		MovementComponent->JumpZVelocity = 300.f;
-		MovementComponent->Mass = 125.f;
+		MovementComponent->Mass = 100.f;
 		break;
 	}
 
