@@ -7,6 +7,7 @@
 #include "ProjectWaterCharacter.h"
 
 #include "Kismet/GameplayStatics.h"
+#include "Components/CapsuleComponent.h"
 
 // Sets default values for this component's properties
 UCharacterState::UCharacterState()
@@ -152,4 +153,15 @@ void UCharacterState::SetState(EState newState)
 
 	State = newState;
 	EnergyTimerStart = std::chrono::system_clock::now();
+
+	if (State == EState::STATE_Water || State == EState::STATE_Vapor)
+	{
+		//Owner->GetCapsuleComponent()->SetCollisionObjectType(ECollisionChannel::ECC_EngineTraceChannel2);
+		Owner->GetCapsuleComponent()->SetCollisionProfileName("FluidState");
+	}
+	else
+	{
+		//Owner->GetCapsuleComponent()->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
+		Owner->GetCapsuleComponent()->SetCollisionProfileName("SolidState");
+	}
 }

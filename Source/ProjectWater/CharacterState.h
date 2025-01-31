@@ -27,7 +27,7 @@ class PROJECTWATER_API UCharacterState : public UActorComponent
 {
 	GENERATED_BODY()
 
-	TObjectPtr< AProjectWaterCharacter> Owner;
+	TObjectPtr<AProjectWaterCharacter> Owner;
 	TObjectPtr<UCharacterMovementComponent> MovementComponent;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetState, BlueprintSetter = SetState)
