@@ -30,10 +30,15 @@ class PROJECTWATER_API UCharacterState : public UActorComponent
 	TObjectPtr< AProjectWaterCharacter> Owner;
 	TObjectPtr<UCharacterMovementComponent> MovementComponent;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetCharacterStateChanged, BlueprintSetter = SetCharacterStateChanged)
+	bool isCharacterStateChanged;
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetState, BlueprintSetter = SetState)
 	EState State;
 
 	float MaxEnergy;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetEnergy)
 	float Energy;
 	/*const */float EnergyRecovery, EnergyUsage;
 
@@ -58,4 +63,12 @@ public:
 	EState GetState() const { return State; }
 	UFUNCTION(BlueprintSetter)
 	void SetState(EState newState);
+
+	UFUNCTION(BlueprintGetter)
+	bool GetCharacterStateChanged() const { return isCharacterStateChanged; }
+	UFUNCTION(BlueprintSetter)
+	void SetCharacterStateChanged(bool changed) { isCharacterStateChanged = changed; }
+
+	UFUNCTION(BlueprintGetter)
+	float GetEnergy() const { return Energy; }
 };
