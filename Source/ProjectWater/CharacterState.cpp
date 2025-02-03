@@ -73,7 +73,7 @@ void UCharacterState::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 	{
 		Energy = 0.f;
 		SetState(EState::STATE_Human);
-		MovementComponent->MaxWalkSpeed *= 0.6f;
+		MovementComponent->MaxWalkSpeed *= 0.1f;
 		//Owner->DamageHearts();
 		UGameplayStatics::ApplyDamage(Owner, 1.f, Owner->GetInstigatorController(), nullptr, NULL);
 

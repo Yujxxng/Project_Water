@@ -45,6 +45,7 @@ class PROJECTWATER_API UCharacterState : public UActorComponent
 	const std::chrono::duration<long, std::milli> EnergyCheckInterval;
 	std::chrono::system_clock::time_point EnergyTimerStart;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetExhausted)
 	bool bExhausted;
 
 public:	
@@ -71,4 +72,10 @@ public:
 
 	UFUNCTION(BlueprintGetter)
 	float GetEnergy() const { return Energy; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetEnergy(float v) { Energy = v; }
+
+	UFUNCTION(BlueprintGetter)
+	bool GetExhausted() const { return bExhausted; }
 };
