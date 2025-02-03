@@ -155,14 +155,14 @@ void UCharacterState::SetState(EState newState)
 	EnergyTimerStart = std::chrono::system_clock::now();
 	isCharacterStateChanged = true;
 
-	if (State == EState::STATE_Water || State == EState::STATE_Vapor)
-	{
-		//Owner->GetCapsuleComponent()->SetCollisionObjectType(ECollisionChannel::ECC_EngineTraceChannel2);
-		Owner->GetCapsuleComponent()->SetCollisionProfileName("FluidState");
-	}
-	else
-	{
-		//Owner->GetCapsuleComponent()->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
-		Owner->GetCapsuleComponent()->SetCollisionProfileName("SolidState");
-	}
+	//if (State == EState::STATE_Water || State == EState::STATE_Vapor)
+	//{
+	//	//Owner->GetCapsuleComponent()->SetCollisionObjectType(ECollisionChannel::ECC_EngineTraceChannel2);
+	//	Owner->GetCapsuleComponent()->SetCollisionProfileName("FluidState");
+	//}
+	//else
+	//{
+	//	//Owner->GetCapsuleComponent()->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
+	//	Owner->GetCapsuleComponent()->SetCollisionProfileName("SolidState");
+	//}
 }
