@@ -30,16 +30,22 @@ class PROJECTWATER_API UCharacterState : public UActorComponent
 	TObjectPtr<AProjectWaterCharacter> Owner;
 	TObjectPtr<UCharacterMovementComponent> MovementComponent;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetCharacterStateChanged, BlueprintSetter = SetCharacterStateChanged)
+	bool isCharacterStateChanged;
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetState, BlueprintSetter = SetState)
 	EState State;
 
 	float MaxEnergy;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetEnergy)
 	float Energy;
 	/*const */float EnergyRecovery, EnergyUsage;
 
 	const std::chrono::duration<long, std::milli> EnergyCheckInterval;
 	std::chrono::system_clock::time_point EnergyTimerStart;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetExhausted)
 	bool bExhausted;
 
 public:	
@@ -58,4 +64,18 @@ public:
 	EState GetState() const { return State; }
 	UFUNCTION(BlueprintSetter)
 	void SetState(EState newState);
+
+	UFUNCTION(BlueprintGetter)
+	bool GetCharacterStateChanged() const { return isCharacterStateChanged; }
+	UFUNCTION(BlueprintSetter)
+	void SetCharacterStateChanged(bool changed) { isCharacterStateChanged = changed; }
+
+	UFUNCTION(BlueprintGetter)
+	float GetEnergy() const { return Energy; }
+
+	UFUNCTION(BlueprintCallable)
+	void SetEnergy(float v) { Energy = v; }
+
+	UFUNCTION(BlueprintGetter)
+	bool GetExhausted() const { return bExhausted; }
 };
