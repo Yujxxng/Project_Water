@@ -22,6 +22,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 AProjectWaterCharacter::AProjectWaterCharacter()
 	: PreJumpVelocity()
 	, MaxHearts(3), Hearts(MaxHearts)
+	, numKeys(0)
 {	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(35.f, 90.f);
@@ -132,6 +133,22 @@ float AProjectWaterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 	}
 
 	return damage;
+}
+
+void AProjectWaterCharacter::GetKey()
+{
+	numKeys++;
+}
+
+bool AProjectWaterCharacter::UseKey()
+{
+	if (numKeys > 0)
+	{
+		numKeys--;
+		return true;
+	}
+
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////////

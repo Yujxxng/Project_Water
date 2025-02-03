@@ -85,6 +85,9 @@ private:
 	UPROPERTY(VisibleDefaultsOnly)
 	int Hearts;
 
+	UPROPERTY(VisibleDefaultsOnly)
+	int numKeys;
+
 public:
 	virtual void Jump() override;
 	virtual void StopJumping() override;
@@ -101,5 +104,11 @@ public:
 	void HealHearts(int num = 1);
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
+
+	UFUNCTION(BlueprintCallable)
+	void GetKey();
+
+	UFUNCTION(BlueprintCallable)
+	bool UseKey();
 };
 
