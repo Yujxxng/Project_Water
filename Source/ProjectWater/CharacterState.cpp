@@ -99,8 +99,10 @@ void UCharacterState::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UCharacterState::SetState(EState newState)
 {
-	if (bExhausted || State == newState || LockedState[int(newState) - 2])
+	if (bExhausted || State == newState ||
+		(newState != EState::STATE_Human && LockedState[int(newState) - 2]))
 	{
+		UE_LOG(LogTemp, Log, TEXT("SetState fail %d"), newState);
 		return;
 	}
 
