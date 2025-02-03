@@ -153,6 +153,7 @@ void UCharacterState::SetState(EState newState)
 
 	State = newState;
 	EnergyTimerStart = std::chrono::system_clock::now();
+	isCharacterStateChanged = true;
 
 	if (State == EState::STATE_Water || State == EState::STATE_Vapor)
 	{
