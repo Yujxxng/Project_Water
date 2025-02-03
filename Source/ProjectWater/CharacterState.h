@@ -36,6 +36,8 @@ class PROJECTWATER_API UCharacterState : public UActorComponent
 	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetState, BlueprintSetter = SetState)
 	EState State;
 
+	bool LockedState[3];
+
 	float MaxEnergy;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetEnergy)
@@ -69,6 +71,9 @@ public:
 	bool GetCharacterStateChanged() const { return isCharacterStateChanged; }
 	UFUNCTION(BlueprintSetter)
 	void SetCharacterStateChanged(bool changed) { isCharacterStateChanged = changed; }
+
+	UFUNCTION(BlueprintCallable)
+	void UnlockState(EState unlock);
 
 	UFUNCTION(BlueprintGetter)
 	float GetEnergy() const { return Energy; }

@@ -23,6 +23,10 @@ UCharacterState::UCharacterState()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	SetState(EState::STATE_Human);
+
+	LockedState[0] = true;
+	LockedState[1] = true;
+	LockedState[2] = true;
 }
 
 
@@ -95,7 +99,7 @@ void UCharacterState::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UCharacterState::SetState(EState newState)
 {
-	if (bExhausted || State == newState)
+	if (bExhausted || State == newState || LockedState[int(newState) - 2])
 	{
 		return;
 	}
@@ -165,4 +169,9 @@ void UCharacterState::SetState(EState newState)
 		//Owner->GetCapsuleComponent()->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
 		Owner->GetCapsuleComponent()->SetCollisionProfileName("SolidState");
 	}
+}
+
+void UCharacterState::UnlockState(EState unlock)
+{
+	LockedState[int(unlock) - 2] = false;
 }
