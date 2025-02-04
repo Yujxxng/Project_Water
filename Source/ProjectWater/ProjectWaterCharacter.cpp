@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 
 #include "CharacterState.h"
+#include "Kismet/GameplayStatics.h"
 #include "Engine/DamageEvents.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -121,8 +122,9 @@ bool AProjectWaterCharacter::CheckHearts()
 
 float AProjectWaterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
+	//Hearts -= int(damage);
+	Hearts -= 1;
 	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-	Hearts -= int(damage);
 	UE_LOG(LogTemp, Log, TEXT("damage %f Hearts %d"), damage, Hearts);
 
 	CheckHearts();
@@ -179,7 +181,8 @@ bool AProjectWaterCharacter::UseOxygen()
 
 	if (Oxygen <= 0.f)
 	{
-		Hearts -= 1;
+		//Hearts -= 1;
+		UGameplayStatics::ApplyDamage(this, 1.f, this->GetInstigatorController(), nullptr, NULL);
 		Oxygen += OxygenUsage * 1000.0 / OxygenCheckInterval.count() * 10;	// 10 seconds
 
 		if (!CheckHearts())

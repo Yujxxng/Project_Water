@@ -108,6 +108,8 @@ public:
 	UCharacterState* CharacterState;
 
 	UFUNCTION(BlueprintCallable)
+	int GetMaxHearts() const { return MaxHearts; }
+	UFUNCTION(BlueprintCallable)
 	int GetHearts() const { return Hearts; }
 
 	UFUNCTION(BlueprintCallable)
