@@ -7,25 +7,19 @@
 #include "Fan.generated.h"
 
 class UCapsuleComponent;
+class UHierarchicalInstancedStaticMeshComponent;
 
 UCLASS()
 class PROJECTWATER_API AFan : public AActor
 {
 	GENERATED_BODY()
-	
 
-	UPROPERTY(VisibleAnywhere)
-	UCapsuleComponent* CollisionComponent;
+	// 컴포넌트
+	UHierarchicalInstancedStaticMeshComponent* HISM;
 
-	UPROPERTY(EditAnywhere)
-	float FanForce;
+	// 변수
+	UStaticMesh* SM;
 
-	UFUNCTION()
-	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
-
-	UFUNCTION()
-	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
-	
 public:	
 	// Sets default values for this actor's properties
 	AFan();
@@ -34,6 +28,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	virtual void OnConstruction(const FTransform& Transform) override;
 
 public:	
 	// Called every frame
