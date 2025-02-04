@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+
+#include <chrono>
 #include "ProjectWaterCharacter.generated.h"
 
 class USpringArmComponent;
@@ -82,11 +84,21 @@ private:
 	FVector PreJumpVelocity;
 
 	int MaxHearts;
-	UPROPERTY(VisibleDefaultsOnly)
+	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetHearts)
 	int Hearts;
 
 	UPROPERTY(VisibleDefaultsOnly)
-	int numKeys;
+	int NumKeys;
+
+	float MaxOxygen;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetOxygen)
+	float Oxygen;
+	float OxygenUsage;
+
+	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetOxygenStart)
+	bool bOxygenStart;
+	const std::chrono::duration<long, std::milli> OxygenCheckInterval;
+	std::chrono::system_clock::time_point UseOxygenStart;
 
 public:
 	virtual void Jump() override;
@@ -98,10 +110,10 @@ public:
 	UFUNCTION(BlueprintCallable)
 	int GetHearts() const { return Hearts; }
 
-	/*UFUNCTION(BlueprintCallable)
-	void DamageHearts(int num = 1);*/
 	UFUNCTION(BlueprintCallable)
 	void HealHearts(int num = 1);
+
+	bool CheckHearts();
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
@@ -110,5 +122,17 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool UseKey();
+
+	UFUNCTION(BlueprintCallable)
+	void RecoverOxygen();
+
+	UFUNCTION(BlueprintGetter)
+	float GetOxygen() const { return Oxygen; }
+
+	UFUNCTION(BlueprintGetter)
+	bool GetOxygenStart() const { return bOxygenStart; }
+
+	UFUNCTION(BlueprintCallable)
+	bool UseOxygen();
 };
 

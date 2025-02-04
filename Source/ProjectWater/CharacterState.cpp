@@ -70,7 +70,7 @@ void UCharacterState::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 			Energy -= EnergyUsage;
 		}
 
-		UE_LOG(LogTemp, Log, TEXT("Energy %f"), Energy);
+		//UE_LOG(LogTemp, Log, TEXT("Energy %f"), Energy);
 		adder -= EnergyCheckInterval;
 	}
 

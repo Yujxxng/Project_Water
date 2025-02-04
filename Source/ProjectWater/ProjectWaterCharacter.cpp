@@ -22,7 +22,9 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 AProjectWaterCharacter::AProjectWaterCharacter()
 	: PreJumpVelocity()
 	, MaxHearts(3), Hearts(MaxHearts)
-	, numKeys(0)
+	, NumKeys(0)
+	, MaxOxygen(100.f), Oxygen(MaxOxygen), OxygenUsage(2.f)
+	, OxygenCheckInterval(1000), bOxygenStart(true), UseOxygenStart()
 {	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(35.f, 90.f);
@@ -71,16 +73,6 @@ void AProjectWaterCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
-//void AProjectWaterCharacter::DamageHearts(int num)
-//{
-//	Hearts -= num;
-//
-//	if (Hearts < 0)
-//	{
-//		UE_LOG(LogTemp, Log, TEXT("!!!!! GAME OVER !!!!!"));
-//	}
-//}
-
 void AProjectWaterCharacter::Jump()
 {
 	PreJumpVelocity = CMC->Velocity;
@@ -117,34 +109,86 @@ void AProjectWaterCharacter::HealHearts(int num)
 	}
 }
 
+bool AProjectWaterCharacter::CheckHearts()
+{
+	if (Hearts < 0)
+	{
+		UE_LOG(LogTemp, Log, TEXT("!!!!! GAME OVER !!!!!"));
+		return false;
+	}
+	return true;
+}
+
 float AProjectWaterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 	Hearts -= int(damage);
 	UE_LOG(LogTemp, Log, TEXT("damage %f Hearts %d"), damage, Hearts);
 
-	if (Hearts < 0)
-	{
-		UE_LOG(LogTemp, Log, TEXT("!!!!! GAME OVER !!!!!"));
-	}
+	CheckHearts();
 
 	return damage;
 }
 
 void AProjectWaterCharacter::GetKey()
 {
-	numKeys++;
+	NumKeys++;
 }
 
 bool AProjectWaterCharacter::UseKey()
 {
-	if (numKeys > 0)
+	if (NumKeys > 0)
 	{
-		numKeys--;
+		NumKeys--;
 		return true;
 	}
 
 	return false;
+}
+
+void AProjectWaterCharacter::RecoverOxygen()
+{
+	bOxygenStart = true;
+	Oxygen = MaxOxygen;
+}
+
+bool AProjectWaterCharacter::UseOxygen()
+{
+	static std::chrono::duration<long, std::milli> adder{ 0 };
+
+	if (bOxygenStart)
+	{
+		UseOxygenStart = std::chrono::system_clock::now();
+		bOxygenStart = false;
+	}
+
+	std::chrono::system_clock::time_point cur = std::chrono::system_clock::now();
+	adder += std::chrono::duration_cast<std::chrono::milliseconds>(cur - UseOxygenStart);
+	if (adder >= OxygenCheckInterval)
+	{
+		UseOxygenStart = cur;
+	}
+
+	while (adder >= OxygenCheckInterval)
+	{
+		Oxygen -= OxygenUsage;
+		adder -= OxygenCheckInterval;
+
+		UE_LOG(LogTemp, Log, TEXT("Oxygen %f"), Oxygen);
+	}
+
+	if (Oxygen <= 0.f)
+	{
+		Hearts -= 1;
+		Oxygen += OxygenUsage * 1000.0 / OxygenCheckInterval.count() * 10;	// 10 seconds
+
+		if (!CheckHearts())
+		{
+			return false;
+		}
+	}
+
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////////
