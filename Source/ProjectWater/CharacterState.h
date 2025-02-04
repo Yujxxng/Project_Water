@@ -75,6 +75,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UnlockState(EState unlock);
 
+	UFUNCTION(BlueprintCallable)
+	bool GetLockedState(EState unlock);
+
 	UFUNCTION(BlueprintGetter)
 	float GetEnergy() const { return Energy; }
 

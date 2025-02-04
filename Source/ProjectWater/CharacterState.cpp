@@ -161,23 +161,28 @@ void UCharacterState::SetState(EState newState)
 	EnergyTimerStart = std::chrono::system_clock::now();
 	isCharacterStateChanged = true;
 
-	switch (State)
-	{
-		case EState::STATE_Water:
-		case EState::STATE_Vapor:
-			Owner->GetCapsuleComponent()->SetCollisionProfileName("FluidState");
-			break;
+	//switch (State)
+	//{
+	//	case EState::STATE_Water:
+	//	case EState::STATE_Vapor:
+	//		Owner->GetCapsuleComponent()->SetCollisionProfileName("FluidState");
+	//		break;
 
-		case EState::STATE_Ice:
-			Owner->GetCapsuleComponent()->SetCollisionProfileName("IceState");
-			break;
+	//	case EState::STATE_Ice:
+	//		Owner->GetCapsuleComponent()->SetCollisionProfileName("IceState");
+	//		break;
 
-		default:
-			Owner->GetCapsuleComponent()->SetCollisionProfileName("HumanState");
-	}
+	//	default:
+	//		Owner->GetCapsuleComponent()->SetCollisionProfileName("HumanState");
+	//}
 }
 
 void UCharacterState::UnlockState(EState unlock)
 {
 	LockedState[int(unlock) - 2] = false;
+}
+
+bool UCharacterState::GetLockedState(EState unlock)
+{
+	return LockedState[int(unlock) - 2];
 }
