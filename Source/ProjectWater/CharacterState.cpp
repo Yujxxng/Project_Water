@@ -23,6 +23,10 @@ UCharacterState::UCharacterState()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	SetState(EState::STATE_Human);
+
+	LockedState[0] = true;
+	LockedState[1] = true;
+	LockedState[2] = true;
 }
 
 
@@ -95,8 +99,10 @@ void UCharacterState::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UCharacterState::SetState(EState newState)
 {
-	if (bExhausted || State == newState)
+	if (bExhausted || State == newState ||
+		(newState != EState::STATE_Human && LockedState[int(newState) - 2]))
 	{
+		UE_LOG(LogTemp, Log, TEXT("SetState fail %d"), newState);
 		return;
 	}
 
@@ -155,14 +161,23 @@ void UCharacterState::SetState(EState newState)
 	EnergyTimerStart = std::chrono::system_clock::now();
 	isCharacterStateChanged = true;
 
-	//if (State == EState::STATE_Water || State == EState::STATE_Vapor)
-	//{
-	//	//Owner->GetCapsuleComponent()->SetCollisionObjectType(ECollisionChannel::ECC_EngineTraceChannel2);
-	//	Owner->GetCapsuleComponent()->SetCollisionProfileName("FluidState");
-	//}
-	//else
-	//{
-	//	//Owner->GetCapsuleComponent()->SetCollisionObjectType(ECollisionChannel::ECC_Pawn);
-	//	Owner->GetCapsuleComponent()->SetCollisionProfileName("SolidState");
-	//}
+	switch (State)
+	{
+		case EState::STATE_Water:
+		case EState::STATE_Vapor:
+			Owner->GetCapsuleComponent()->SetCollisionProfileName("FluidState");
+			break;
+
+		case EState::STATE_Ice:
+			Owner->GetCapsuleComponent()->SetCollisionProfileName("IceState");
+			break;
+
+		default:
+			Owner->GetCapsuleComponent()->SetCollisionProfileName("HumanState");
+	}
+}
+
+void UCharacterState::UnlockState(EState unlock)
+{
+	LockedState[int(unlock) - 2] = false;
 }

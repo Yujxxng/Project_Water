@@ -22,6 +22,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 AProjectWaterCharacter::AProjectWaterCharacter()
 	: PreJumpVelocity()
 	, MaxHearts(3), Hearts(MaxHearts)
+	, numKeys(0)
 {	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(35.f, 90.f);
@@ -119,12 +120,8 @@ void AProjectWaterCharacter::HealHearts(int num)
 float AProjectWaterCharacter::TakeDamage(float DamageAmount, FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser)
 {
 	float damage = Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
-
-	// PointDamage
-	if (DamageEvent.IsOfType(FPointDamageEvent::ClassID))
-	{
-		Hearts -= int(damage);
-	}
+	Hearts -= int(damage);
+	UE_LOG(LogTemp, Log, TEXT("damage %f Hearts %d"), damage, Hearts);
 
 	if (Hearts < 0)
 	{
@@ -132,6 +129,22 @@ float AProjectWaterCharacter::TakeDamage(float DamageAmount, FDamageEvent const&
 	}
 
 	return damage;
+}
+
+void AProjectWaterCharacter::GetKey()
+{
+	numKeys++;
+}
+
+bool AProjectWaterCharacter::UseKey()
+{
+	if (numKeys > 0)
+	{
+		numKeys--;
+		return true;
+	}
+
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////////
