@@ -39,7 +39,6 @@ class PROJECTWATER_API UCharacterState : public UActorComponent
 	bool LockedState[3];
 
 	float MaxEnergy;
-
 	UPROPERTY(VisibleDefaultsOnly, BlueprintGetter = GetEnergy)
 	float Energy;
 	/*const */float EnergyRecovery, EnergyUsage;
