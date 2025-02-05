@@ -91,8 +91,8 @@ void AProjectWaterCharacter::StopJumping()
 {
 	Super::StopJumping();
 
-	CMC->Velocity.X = PreJumpVelocity.X * 0.5f;
-	CMC->Velocity.Y = PreJumpVelocity.Y * 0.5f;
+	CMC->Velocity.X = PreJumpVelocity.X * 0.6f;
+	CMC->Velocity.Y = PreJumpVelocity.Y * 0.6f;
 
 	if (PreJumpVelocity.Z >= 0.00001f)
 	{
