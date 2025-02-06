@@ -115,6 +115,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void HealHearts(int num = 1);
 
+	UFUNCTION(BlueprintCallable)
 	bool CheckHearts();
 
 	virtual float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
