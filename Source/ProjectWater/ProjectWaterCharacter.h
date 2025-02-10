@@ -110,6 +110,9 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterState", meta = (AllowPrivateAccess = "true"))
 	UCharacterState* CharacterState;
 
+	UFUNCTION(BlueprintCallable)
+	void SetEnableInput(bool b);
+
 	UFUNCTION(BlueprintSetter)
 	void SetIgnoreInput(bool b);
 

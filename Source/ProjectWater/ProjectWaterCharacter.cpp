@@ -101,6 +101,24 @@ void AProjectWaterCharacter::StopJumping()
 	}
 }
 
+void AProjectWaterCharacter::SetEnableInput(bool b)
+{
+	APlayerController* pc = GetWorld()->GetFirstPlayerController();
+	if (!pc)
+	{
+		return;
+	}
+
+	if (b)
+	{
+		pc->EnableInput(nullptr);
+	}
+	else
+	{
+		pc->DisableInput(nullptr);
+	}
+}
+
 void AProjectWaterCharacter::SetIgnoreInput(bool b)
 {
 	bIgnoreInput = b;
