@@ -81,6 +81,9 @@ public:
 private:
 	TObjectPtr<UCharacterMovementComponent> CMC;
 
+	UPROPERTY(VisibleDefaultsOnly, BlueprintSetter = SetIgnoreInput)
+	bool bIgnoreInput;
+
 	FVector PreJumpVelocity;
 
 	int MaxHearts;
@@ -106,6 +109,12 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterState", meta = (AllowPrivateAccess = "true"))
 	UCharacterState* CharacterState;
+
+	UFUNCTION(BlueprintCallable)
+	void SetEnableInput(bool b);
+
+	UFUNCTION(BlueprintSetter)
+	void SetIgnoreInput(bool b);
 
 	UFUNCTION(BlueprintCallable)
 	int GetMaxHearts() const { return MaxHearts; }
