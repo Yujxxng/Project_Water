@@ -22,6 +22,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 AProjectWaterCharacter::AProjectWaterCharacter()
 	: PreJumpVelocity()
+	, bIgnoreInput(false)
 	, MaxHearts(3), Hearts(MaxHearts)
 	, NumKeys(0)
 	, MaxOxygen(100.f), Oxygen(MaxOxygen), OxygenUsage(2.f)
@@ -46,7 +47,7 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 200.0f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -98,6 +99,29 @@ void AProjectWaterCharacter::StopJumping()
 	{
 		CMC->JumpZVelocity = PreJumpVelocity.Z;
 	}
+}
+
+void AProjectWaterCharacter::SetEnableInput(bool b)
+{
+	APlayerController* pc = GetWorld()->GetFirstPlayerController();
+	if (!pc)
+	{
+		return;
+	}
+
+	if (b)
+	{
+		pc->EnableInput(nullptr);
+	}
+	else
+	{
+		pc->DisableInput(nullptr);
+	}
+}
+
+void AProjectWaterCharacter::SetIgnoreInput(bool b)
+{
+	bIgnoreInput = b;
 }
 
 void AProjectWaterCharacter::HealHearts(int num)
@@ -229,6 +253,11 @@ void AProjectWaterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 void AProjectWaterCharacter::Move(const FInputActionValue& Value)
 {
+	if (bIgnoreInput)
+	{
+		return;
+	}
+
 	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
@@ -252,6 +281,11 @@ void AProjectWaterCharacter::Move(const FInputActionValue& Value)
 
 void AProjectWaterCharacter::Look(const FInputActionValue& Value)
 {
+	if (bIgnoreInput)
+	{
+		return;
+	}
+
 	// input is a Vector2D
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
