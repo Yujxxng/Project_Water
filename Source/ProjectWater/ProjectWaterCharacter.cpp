@@ -73,6 +73,7 @@ void AProjectWaterCharacter::BeginPlay()
 
 	// Call the base class  
 	Super::BeginPlay();
+	LoadData();
 }
 
 void AProjectWaterCharacter::Jump()
@@ -216,6 +217,18 @@ bool AProjectWaterCharacter::UseOxygen()
 	}
 
 	return true;
+}
+
+void AProjectWaterCharacter::LoadData()
+{
+	UWaterGameInstance* GameInstance = Cast<UWaterGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (GameInstance)
+	{
+		Hearts = GameInstance->HeartNum;
+		UE_LOG(LogTemp, Warning, TEXT("Hearts Load"));
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("Hearts Load fail"));
 }
 
 //////////////////////////////////////////////////////////////////////////
