@@ -65,6 +65,7 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	
 	// Create a character state
 	CharacterState = CreateDefaultSubobject<UCharacterState>(TEXT("CharacterState"));
+	LoadData();
 }
 
 void AProjectWaterCharacter::BeginPlay()
@@ -73,7 +74,7 @@ void AProjectWaterCharacter::BeginPlay()
 
 	// Call the base class  
 	Super::BeginPlay();
-	LoadData();
+	//LoadData();
 }
 
 void AProjectWaterCharacter::Jump()

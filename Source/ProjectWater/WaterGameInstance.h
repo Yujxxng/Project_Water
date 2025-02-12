@@ -17,6 +17,11 @@ class PROJECTWATER_API UWaterGameInstance : public UGameInstance
 public:
 	UWaterGameInstance();
 
+	virtual void Init() override;
+	void CreateSaveFile();
+	void SaveGame();
+	void LoadGame();
+
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	TArray<bool> LockedStates;
 	

@@ -188,6 +188,11 @@ bool UCharacterState::GetLockedState(EState unlock)
 	return LockedState[int(unlock) - 2];
 }
 
+bool UCharacterState::GetLockedState(int i) const
+{
+	return LockedState[i];
+}
+
 void UCharacterState::LoadStates()
 {
 	UWaterGameInstance* GameInstance = Cast<UWaterGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
