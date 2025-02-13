@@ -16,6 +16,7 @@ class UInputAction;
 struct FInputActionValue;
 
 class UCharacterState;
+class UEnhancedInputLocalPlayerSubsystem;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -80,6 +81,9 @@ public:
 
 private:
 	TObjectPtr<UCharacterMovementComponent> CMC;
+
+	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> InputSubSystem;
+	TObjectPtr<APlayerController> PC;
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintSetter = SetIgnoreInput)
 	bool bIgnoreInput;

@@ -21,7 +21,8 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 // AMoveCharacter
 
 AProjectWaterCharacter::AProjectWaterCharacter()
-	: PreJumpVelocity()
+	: InputSubSystem(nullptr)
+	, PreJumpVelocity()
 	, bIgnoreInput(false)
 	, MaxHearts(3), Hearts(MaxHearts)
 	, NumKeys(0)
@@ -58,6 +59,7 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
+	PC = Cast<APlayerController>(GetController());
 
 	// Ignore collision with camera
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
@@ -79,10 +81,21 @@ void AProjectWaterCharacter::Jump()
 {
 	PreJumpVelocity = CMC->Velocity;
 	PreJumpVelocity.Z = 0.f;
-	if (PreJumpVelocity.X > 0.1f || PreJumpVelocity.Y > 0.1f)
+
+	FInputActionValue moveValue = InputSubSystem->GetPlayerInput()->GetActionValue(MoveAction);
+	if (moveValue.IsNonZero() || CharacterState->GetExhausted())
 	{
 		PreJumpVelocity.Z = CMC->JumpZVelocity;
-		CMC->JumpZVelocity *= 1.2f;
+
+		if (moveValue.IsNonZero())
+		{
+			CMC->JumpZVelocity *= 1.2f;
+		}
+
+		if (CharacterState->GetExhausted())
+		{
+			CMC->JumpZVelocity *= 0.4f;
+		}
 	}
 
 	Super::Jump();
@@ -99,23 +112,34 @@ void AProjectWaterCharacter::StopJumping()
 	{
 		CMC->JumpZVelocity = PreJumpVelocity.Z;
 	}
+
+	FInputActionValue moveValue = InputSubSystem->GetPlayerInput()->GetActionValue(MoveAction);
+	if (moveValue.IsNonZero())
+	{
+
+		Move(moveValue);
+		FVector2D moveVector = moveValue.Get<FVector2D>();
+		//CMC->Velocity.X = moveVector.X;
+		//CMC->Velocity.Y = moveVector.Y;
+
+		UE_LOG(LogTemp, Log, TEXT("moveVector %f %f"), moveVector.X, moveVector.Y);
+	}
 }
 
 void AProjectWaterCharacter::SetEnableInput(bool b)
 {
-	APlayerController* pc = GetWorld()->GetFirstPlayerController();
-	if (!pc)
+	if (!PC)
 	{
-		return;
+		PC = Cast<APlayerController>(GetController());
 	}
 
 	if (b)
 	{
-		pc->EnableInput(nullptr);
+		PC->EnableInput(nullptr);
 	}
 	else
 	{
-		pc->DisableInput(nullptr);
+		PC->DisableInput(nullptr);
 	}
 }
 
@@ -228,6 +252,7 @@ void AProjectWaterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 	{
 		if (UEnhancedInputLocalPlayerSubsystem* Subsystem = ULocalPlayer::GetSubsystem<UEnhancedInputLocalPlayerSubsystem>(PlayerController->GetLocalPlayer()))
 		{
+			InputSubSystem = Subsystem;
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}

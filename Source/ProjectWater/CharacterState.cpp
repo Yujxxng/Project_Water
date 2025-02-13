@@ -168,10 +168,6 @@ void UCharacterState::SetState(EState newState)
 			Owner->GetCapsuleComponent()->SetCollisionProfileName("FluidState");
 			break;
 
-		//case EState::STATE_Ice:
-		//	Owner->GetCapsuleComponent()->SetCollisionProfileName("IceState");
-		//	break;
-
 		default:
 			Owner->GetCapsuleComponent()->SetCollisionProfileName("SolidState");
 	}
