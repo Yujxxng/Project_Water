@@ -153,5 +153,9 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void LoadData();
+
+	/* TEMP FUNCTION */
+	UFUNCTION(BlueprintCallable)
+	void MoveBlueprintTemp(FVector2D Value);
 };
 
