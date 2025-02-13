@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
-
+#include "WaterGameInstance.h"
 #include <chrono>
 #include "ProjectWaterCharacter.generated.h"
 
@@ -150,5 +150,8 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool UseOxygen();
+
+	UFUNCTION(BlueprintCallable)
+	void LoadData();
 };
 
