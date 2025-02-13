@@ -6,6 +6,28 @@
 #include "Kismet/GameplayStatics.h"
 #include "ProjectWaterCharacter.h"
 #include "CharacterState.h"
+AWaterGameMode::AWaterGameMode()
+{
+	static ConstructorHelpers::FObjectFinder<UDataTable> ItemData(TEXT("/Game/CollectorBook/DT_ItemDataTable"));
+	if (ItemData.Succeeded())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DataTable Succeed!"));
+		ItemDataTable = ItemData.Object;
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("DataTable Fail"));
+}
+void AWaterGameMode::BeginPlay()
+{
+	Super::BeginPlay();
+	if (ItemDataTable != nullptr)
+	{
+		auto DataList = ItemDataTable->GetRowNames();
+		FName tempname = DataList[1];
+		FItemTableRow* Itemtable = ItemDataTable->FindRow<FItemTableRow>(tempname, FString(""));
+		UE_LOG(LogTemp, Log, TEXT("%s , %s"), *(Itemtable->ID), *(Itemtable->Name));
+	}
+}
 void AWaterGameMode::UpdateStates()
 {
 	if (auto waterGameInstance = Cast<UWaterGameInstance>(GetGameInstance()))
