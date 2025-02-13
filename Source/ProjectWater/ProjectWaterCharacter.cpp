@@ -45,10 +45,19 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	CMC->MinAnalogWalkSpeed = 20.f;
 	CMC->JumpZVelocity = 750.f;
 
+	// Camera Setting
+	CameraSetting[0].Length = 800.f;
+	CameraSetting[0].TargetOffset = FVector(0.f, 0.f, 800.f);
+	CameraSetting[0].CamRotation = FVector(0.f, -45.f, 0.f);
+
+	CameraSetting[1].Length = 300.f;
+	CameraSetting[1].TargetOffset = FVector(0.f, 0.f, 130.f);
+	CameraSetting[1].CamRotation = FVector(0.f, 0.f, 0.f);
+
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = CameraSetting[0].Length; // The camera follows at this distance behind the character
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -67,6 +76,7 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	
 	// Create a character state
 	CharacterState = CreateDefaultSubobject<UCharacterState>(TEXT("CharacterState"));
+
 	LoadData();
 }
 
@@ -107,8 +117,17 @@ void AProjectWaterCharacter::StopJumping()
 {
 	Super::StopJumping();
 
-	CMC->Velocity.X = PreJumpVelocity.X * 0.6f;
-	CMC->Velocity.Y = PreJumpVelocity.Y * 0.6f;
+	switch (CharacterState->GetState())
+	{
+	case EState::STATE_Vapor:
+	case EState::STATE_Ice:
+		CMC->Velocity.X = PreJumpVelocity.X;
+		CMC->Velocity.Y = PreJumpVelocity.Y;
+
+	default:
+		CMC->Velocity.X = PreJumpVelocity.X * 0.6f;
+		CMC->Velocity.Y = PreJumpVelocity.Y * 0.6f;
+	}
 
 	if (PreJumpVelocity.Z >= 0.00001f)
 	{
@@ -118,14 +137,20 @@ void AProjectWaterCharacter::StopJumping()
 	FInputActionValue moveValue = InputSubSystem->GetPlayerInput()->GetActionValue(MoveAction);
 	if (moveValue.IsNonZero())
 	{
-
 		Move(moveValue);
-		FVector2D moveVector = moveValue.Get<FVector2D>();
-		//CMC->Velocity.X = moveVector.X;
-		//CMC->Velocity.Y = moveVector.Y;
-
-		UE_LOG(LogTemp, Log, TEXT("moveVector %f %f"), moveVector.X, moveVector.Y);
 	}
+}
+
+void AProjectWaterCharacter::SetCameraSetting(int mode)
+{
+	CameraBoom->TargetArmLength = CameraSetting[mode].Length;
+	CameraBoom->TargetOffset = CameraSetting[mode].TargetOffset;
+	
+	FRotator tmp;
+	tmp.Pitch = CameraSetting[mode].CamRotation.Y;
+	tmp.Yaw = CameraSetting[mode].CamRotation.Z;
+	tmp.Roll = CameraSetting[mode].CamRotation.X;
+	FollowCamera->SetRelativeRotation(tmp);
 }
 
 void AProjectWaterCharacter::SetEnableInput(bool b)

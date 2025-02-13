@@ -18,6 +18,23 @@ struct FInputActionValue;
 class UCharacterState;
 class UEnhancedInputLocalPlayerSubsystem;
 
+USTRUCT(BlueprintType)
+struct FCameraSetting
+{
+	GENERATED_BODY()
+
+	// Camera Arm
+	UPROPERTY(BlueprintReadOnly)
+	float Length;
+
+	UPROPERTY(BlueprintReadOnly)
+	FVector TargetOffset;
+
+	// Camera
+	UPROPERTY(BlueprintReadOnly)
+	FVector CamRotation;
+};
+
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config = Game)
@@ -85,6 +102,9 @@ private:
 	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> InputSubSystem;
 	TObjectPtr<APlayerController> PC;
 
+	// Camera setting for World map(0), Game map(1)
+	FCameraSetting CameraSetting[2];
+
 	UPROPERTY(VisibleDefaultsOnly, BlueprintSetter = SetIgnoreInput)
 	bool bIgnoreInput;
 
@@ -113,6 +133,10 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterState", meta = (AllowPrivateAccess = "true"))
 	UCharacterState* CharacterState;
+
+	/** mode 0: World map, 1: Game map **/
+	UFUNCTION(BlueprintCallable)
+	void SetCameraSetting(int mode);
 
 	UFUNCTION(BlueprintCallable)
 	void SetEnableInput(bool b);
