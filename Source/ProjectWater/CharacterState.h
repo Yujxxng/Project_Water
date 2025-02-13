@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
-
+#include "WaterGameInstance.h"
 #include <chrono>
 #include "CharacterState.generated.h"
 
@@ -76,6 +76,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool GetLockedState(EState unlock);
+	bool GetLockedState(int i) const;
 
 	UFUNCTION(BlueprintGetter)
 	float GetEnergy() const { return Energy; }
@@ -85,4 +86,9 @@ public:
 
 	UFUNCTION(BlueprintGetter)
 	bool GetExhausted() const { return bExhausted; }
+
+public:
+	//GameInstance
+	UFUNCTION(BlueprintCallable)
+	void LoadStates();
 };

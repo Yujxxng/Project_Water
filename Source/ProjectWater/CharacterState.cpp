@@ -37,6 +37,7 @@ void UCharacterState::BeginPlay()
 
 	Owner = Cast<AProjectWaterCharacter>(GetOwner<AProjectWaterCharacter>());
 	MovementComponent = Owner->GetCharacterMovement();
+	LoadStates();
 }
 
 
@@ -181,4 +182,22 @@ void UCharacterState::UnlockState(EState unlock)
 bool UCharacterState::GetLockedState(EState unlock)
 {
 	return LockedState[int(unlock) - 2];
+}
+
+bool UCharacterState::GetLockedState(int i) const
+{
+	return LockedState[i];
+}
+
+void UCharacterState::LoadStates()
+{
+	UWaterGameInstance* GameInstance = Cast<UWaterGameInstance>(UGameplayStatics::GetGameInstance(GetWorld()));
+	if (GameInstance)
+	{
+		for (int i = 0; i < 3; i++)
+			LockedState[i] = GameInstance->LockedStates[i];
+		//UE_LOG(LogTemp, Warning, TEXT("States Load"));
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("States Load fail"));
 }
