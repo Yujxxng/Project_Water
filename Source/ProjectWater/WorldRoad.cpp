@@ -9,10 +9,12 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Curves/CurveFloat.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 // Sets default values
 AWorldRoad::AWorldRoad()
-	: Offset(30.f), Spacing(0.f), Multiplier(0.1f)
+	: Player(nullptr)
+	, Offset(30.f), Spacing(0.f), Multiplier(0.1f)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -47,33 +49,38 @@ FVector AWorldRoad::GetLocationAlongSpline(int idx)
 
 void AWorldRoad::MoveTimeLine(float value)
 {
-	static AProjectWaterCharacter* player = Cast<AProjectWaterCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+	//static const FVector forward(0.f, 1.f, 0.f);
+	//static const FVector right(1.f, 0.f, 0.f);
 
 	float length = Spline->GetSplineLength();
-	static FVector location;
-	location = GetActorLocation() + Spline->GetLocationAtDistanceAlongSpline(length * value, ESplineCoordinateSpace::Local);
-
-	if (player)
+	FVector location = Spline->GetLocationAtDistanceAlongSpline(length * value, ESplineCoordinateSpace::World);
+	//UE_LOG(LogTemp, Log, TEXT("value %f | location %f %f"), value, location.X, location.Y);
+	if (IsValid(Player))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("location %f %f"), location.X, location.Y);
-		player->SetActorLocation(location);
+		FVector playerLocation = Player->GetActorLocation();
+		FVector direction = location - playerLocation;
+		direction.Z = 0.f;
+
+		location.Z = playerLocation.Z;
+		Player->SetActorLocation(location);
+		
+		const FRotator rotation = UKismetMathLibrary::FindLookAtRotation(playerLocation, location);
+		Player->SetActorRotation(FQuat(rotation));
+		
+		FVector forward = Player->GetActorForwardVector();
+		FVector right = Player->GetActorRightVector();
+
+		//UE_LOG(LogTemp, Log, TEXT("direction %f %f || forward %f %f"), direction.X, direction.Y, forward.X, forward.Y);
+		//UE_LOG(LogTemp, Log, TEXT("dot product %f"), FVector::DotProduct(forward, direction));
+		//Player->GetCharacterMovement()->MaxWalkSpeed *= length;
+		//Player->GetMesh()->SetPhysicsLinearVelocity(FVector(length, 0.f, 0.f));
+		//Player->AddMovementInput(forward, FVector::DotProduct(forward, direction));
+		//Player->AddMovementInput(right, FVector::DotProduct(right, direction));
 	}
 }
 
-// Called when the game starts or when spawned
-void AWorldRoad::BeginPlay()
+void AWorldRoad::Construct()
 {
-	Super::BeginPlay();
-	
-	Timeline->AddInterpFloat(Curve, MoveCallback);
-	Timeline->SetTimelineLength(1.f);
-	Timeline->SetLooping(false);
-}
-
-void AWorldRoad::OnConstruction(const FTransform& Transform)
-{
-	Super::OnConstruction(Transform);
-
 	if (IsValid(InstancedStaticMesh))
 	{
 		InstancedStaticMesh->ClearInstances();
@@ -100,10 +107,32 @@ void AWorldRoad::OnConstruction(const FTransform& Transform)
 	}
 }
 
+// Called when the game starts or when spawned
+void AWorldRoad::BeginPlay()
+{
+	Super::BeginPlay();
+
+	Construct();
+	
+	Player = Cast<AProjectWaterCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
+
+	Timeline->AddInterpFloat(Curve, MoveCallback);
+	Timeline->SetTimelineLength(1.f);
+	Timeline->SetLooping(false);
+}
+
+void AWorldRoad::OnConstruction(const FTransform& Transform)
+{
+	Super::OnConstruction(Transform);
+
+	Construct();
+}
+
 // Called every frame
 void AWorldRoad::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
 
 }
 

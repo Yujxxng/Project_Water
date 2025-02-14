@@ -10,6 +10,7 @@
 class UInstancedStaticMeshComponent;
 class USplineComponent;
 class UCurveFloat;
+class AProjectWaterCharacter;
 
 UCLASS()
 class PROJECTWATER_API AWorldRoad : public AActor
@@ -24,10 +25,10 @@ class PROJECTWATER_API AWorldRoad : public AActor
 
 	UStaticMesh* SplineMesh;
 
+	TObjectPtr<AProjectWaterCharacter> Player;
+
 	float Spacing;
 	float Multiplier;
-
-	FVector GetLocationAlongSpline(int idx);
 	
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Timeline, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UTimelineComponent> Timeline;
@@ -37,6 +38,8 @@ class PROJECTWATER_API AWorldRoad : public AActor
 	FOnTimelineFloat MoveCallback;
 	UFUNCTION()
 	void MoveTimeLine(float value);
+
+	void Construct();
 
 public:	
 	// Sets default values for this actor's properties
@@ -54,6 +57,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite)
 	float Offset;
+
+	UFUNCTION(BlueprintCallable)
+	FVector GetLocationAlongSpline(int idx);
 
 	
 };

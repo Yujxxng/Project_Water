@@ -18,6 +18,15 @@ struct FInputActionValue;
 class UCharacterState;
 class UEnhancedInputLocalPlayerSubsystem;
 
+UENUM(BlueprintType)
+enum class EMoveMode : uint8
+{
+	MOVE_None	UMETA(Hidden),
+	MOVE_World	UMETA(DisplayName = "WorldMapMode"),
+	MOVE_Game	UMETA(DisplayName = "GameMapMode"),
+	MOVE_Max	UMETA(Hidden)
+};
+
 USTRUCT(BlueprintType)
 struct FCameraSetting
 {
@@ -73,6 +82,7 @@ public:
 protected:
 
 	/** Called for movement input */
+	UFUNCTION(BlueprintCallable)
 	void Move(const FInputActionValue& Value);
 
 	/** Called for looking input */
@@ -98,12 +108,13 @@ public:
 
 private:
 	TObjectPtr<UCharacterMovementComponent> CMC;
+	EMoveMode MoveMode;
+
+	FCameraSetting CameraSetting[2];
+	void SetCameraSetting(EMoveMode Mode);
 
 	TObjectPtr<UEnhancedInputLocalPlayerSubsystem> InputSubSystem;
 	TObjectPtr<APlayerController> PC;
-
-	// Camera setting for World map(0), Game map(1)
-	FCameraSetting CameraSetting[2];
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintSetter = SetIgnoreInput)
 	bool bIgnoreInput;
@@ -134,9 +145,8 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterState", meta = (AllowPrivateAccess = "true"))
 	UCharacterState* CharacterState;
 
-	/** mode 0: World map, 1: Game map **/
 	UFUNCTION(BlueprintCallable)
-	void SetCameraSetting(int mode);
+	void SetMoveMode(EMoveMode Mode);
 
 	UFUNCTION(BlueprintCallable)
 	void SetEnableInput(bool b);
