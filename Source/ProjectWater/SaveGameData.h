@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemComponent.h"
+#include "ItemDataTable.h"
 #include "GameFramework/SaveGame.h"
 #include "SaveGameData.generated.h"
 
@@ -16,6 +18,9 @@ class PROJECTWATER_API USaveGameData : public USaveGame
 	
 public:
 	USaveGameData();
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<FPlayerCollect> PlayerItem;
 
 	UPROPERTY(VisibleAnywhere)
 	TArray<bool> LockedStates;

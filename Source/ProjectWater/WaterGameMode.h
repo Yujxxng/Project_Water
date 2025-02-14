@@ -3,8 +3,6 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "ItemDataTable.h"
-#include "UObject/ConstructorHelpers.h"
 #include "GameFramework/GameModeBase.h"
 #include "WaterGameMode.generated.h"
 
@@ -23,6 +21,6 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void UpdateStates();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	class UDataTable* ItemDataTable;
+	UFUNCTION(BlueprintCallable)
+	void UpdateCollector(FString ItemID);
 };

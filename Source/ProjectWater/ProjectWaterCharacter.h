@@ -16,6 +16,7 @@ class UInputAction;
 struct FInputActionValue;
 
 class UCharacterState;
+class UItemComponent;
 class UEnhancedInputLocalPlayerSubsystem;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -113,6 +114,8 @@ public:
 
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "CharacterState", meta = (AllowPrivateAccess = "true"))
 	UCharacterState* CharacterState;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
+	UItemComponent* CharacterCollector;
 
 	UFUNCTION(BlueprintCallable)
 	void SetEnableInput(bool b);

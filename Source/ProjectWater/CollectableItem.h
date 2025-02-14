@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h"
 #include "CollectableItem.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FGetItem, FString, itemID);
+
 UCLASS()
 class PROJECTWATER_API ACollectableItem : public AActor
 {
@@ -24,8 +26,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void SetItem(FName ItemName);
-
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FString ID;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -39,7 +39,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UStaticMesh* Mesh;
 
-
+	UPROPERTY(BlueprintAssignable)
+	FGetItem OnGetItem;
 	/*UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	class UDataTable* ItemDataTable;*/
 };

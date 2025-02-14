@@ -34,9 +34,3 @@ void ACollectableItem::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 }
-
-void ACollectableItem::SetItem(FName ItemName)
-{
-
-}
-

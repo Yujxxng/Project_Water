@@ -8,25 +8,11 @@
 #include "CharacterState.h"
 AWaterGameMode::AWaterGameMode()
 {
-	static ConstructorHelpers::FObjectFinder<UDataTable> ItemData(TEXT("/Game/CollectorBook/DT_ItemDataTable"));
-	if (ItemData.Succeeded())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("DataTable Succeed!"));
-		ItemDataTable = ItemData.Object;
-	}
-	else
-		UE_LOG(LogTemp, Warning, TEXT("DataTable Fail"));
+	
 }
 void AWaterGameMode::BeginPlay()
 {
 	Super::BeginPlay();
-	if (ItemDataTable != nullptr)
-	{
-		auto DataList = ItemDataTable->GetRowNames();
-		FName tempname = DataList[1];
-		FItemTableRow* Itemtable = ItemDataTable->FindRow<FItemTableRow>(tempname, FString(""));
-		UE_LOG(LogTemp, Log, TEXT("%s , %s"), *(Itemtable->ID), *(Itemtable->Name));
-	}
 }
 void AWaterGameMode::UpdateStates()
 {
@@ -50,6 +36,31 @@ void AWaterGameMode::UpdateStates()
 		}
 		waterGameInstance->SaveGame();
 		UE_LOG(LogTemp, Warning, TEXT("Save"));
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("Fail to Get GameInstance in WaterGameMode"));
+}
+
+void AWaterGameMode::UpdateCollector(FString itemID)
+{
+	if (auto waterGameInstance = Cast<UWaterGameInstance>(GetGameInstance()))
+	{
+		ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
+		if (PlayerCharacter)
+		{
+			AProjectWaterCharacter* MyCharacter = Cast<AProjectWaterCharacter>(PlayerCharacter);
+			if (MyCharacter)
+			{
+				for (int i = 0; i < waterGameInstance->PlayerItem.Num(); i++)
+				{
+					if(waterGameInstance->PlayerItem[i].ID == itemID)
+						waterGameInstance->PlayerItem[i].IsCollected = true;
+				}
+			}
+
+		}
+		waterGameInstance->SaveGame();
+		UE_LOG(LogTemp, Warning, TEXT("Save Collector"));
 	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("Fail to Get GameInstance in WaterGameMode"));

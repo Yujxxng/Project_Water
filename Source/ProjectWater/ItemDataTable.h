@@ -18,6 +18,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	FString Name;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	FString Detail;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	bool IsCollected;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	TArray<UTexture2D*> Textures;
