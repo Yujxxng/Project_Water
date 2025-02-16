@@ -21,8 +21,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 // AMoveCharacter
 
 AProjectWaterCharacter::AProjectWaterCharacter()
-	: MoveMode(EMoveMode::MOVE_None)
-	, InputSubSystem(nullptr)
+	: InputSubSystem(nullptr)
 	, PreJumpVelocity()
 	, bIgnoreInput(false)
 	, MaxHearts(3), Hearts(MaxHearts)
@@ -46,19 +45,10 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	CMC->MinAnalogWalkSpeed = 20.f;
 	CMC->JumpZVelocity = 750.f;
 
-	// Camera Setting
-	CameraSetting[0].Length = 800.f;
-	CameraSetting[0].TargetOffset = FVector(0.f, 0.f, 800.f);
-	CameraSetting[0].CamRotation = FVector(0.f, -45.f, 0.f);
-
-	CameraSetting[1].Length = 300.f;
-	CameraSetting[1].TargetOffset = FVector(0.f, 0.f, 130.f);
-	CameraSetting[1].CamRotation = FVector(0.f, 0.f, 0.f);
-
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = CameraSetting[0].Length; // The camera follows at this distance behind the character
+	CameraBoom->TargetArmLength = 350.f; // The camera follows at this distance behind the character
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -88,25 +78,6 @@ void AProjectWaterCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 	//LoadData();
-}
-
-void AProjectWaterCharacter::SetMoveMode(EMoveMode Mode)
-{
-	MoveMode = Mode;
-	SetCameraSetting(Mode);
-}
-
-void AProjectWaterCharacter::SetCameraSetting(EMoveMode Mode)
-{
-	int idx = int(Mode) - 1;
-	CameraBoom->TargetArmLength = CameraSetting[idx].Length;
-	CameraBoom->TargetOffset = CameraSetting[idx].TargetOffset;
-	
-	FRotator tmp;
-	tmp.Pitch = CameraSetting[idx].CamRotation.Y;
-	tmp.Yaw = CameraSetting[idx].CamRotation.Z;
-	tmp.Roll = CameraSetting[idx].CamRotation.X;
-	FollowCamera->SetRelativeRotation(tmp);
 }
 
 void AProjectWaterCharacter::SetEnableInput(bool b)
@@ -239,11 +210,6 @@ void AProjectWaterCharacter::LoadData()
 
 void AProjectWaterCharacter::MoveBlueprintTemp(FVector2D Value)
 {
-	if (MoveMode != EMoveMode::MOVE_Game)
-	{
-		return;
-	}
-
 	if (Controller != nullptr)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Value %f %f"), Value.X, Value.Y);
@@ -300,140 +266,98 @@ void AProjectWaterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 void AProjectWaterCharacter::Jump()
 {
-	switch (MoveMode)
-	{
-	case EMoveMode::MOVE_World:
-	{
+	PreJumpVelocity = CMC->Velocity;
+	PreJumpVelocity.Z = 0.f;
 
-		break;
-	}
-
-	case EMoveMode::MOVE_Game:
+	FInputActionValue moveValue = InputSubSystem->GetPlayerInput()->GetActionValue(MoveAction);
+	if (moveValue.IsNonZero() || CharacterState->GetExhausted())
 	{
-		PreJumpVelocity = CMC->Velocity;
-		PreJumpVelocity.Z = 0.f;
+		PreJumpVelocity.Z = CMC->JumpZVelocity;
 
-		FInputActionValue moveValue = InputSubSystem->GetPlayerInput()->GetActionValue(MoveAction);
-		if (moveValue.IsNonZero() || CharacterState->GetExhausted())
+		if (moveValue.IsNonZero())
 		{
-			PreJumpVelocity.Z = CMC->JumpZVelocity;
-
-			if (moveValue.IsNonZero())
-			{
-				CMC->JumpZVelocity *= 1.2f;
-			}
-
-			if (CharacterState->GetExhausted())
-			{
-				CMC->JumpZVelocity *= 0.4f;
-			}
+			CMC->JumpZVelocity *= 1.2f;
 		}
 
-		Super::Jump();
+		if (CharacterState->GetExhausted())
+		{
+			CMC->JumpZVelocity *= 0.4f;
+		}
 	}
-	}
+
+	Super::Jump();
 }
 
 void AProjectWaterCharacter::StopJumping()
 {
-	switch (MoveMode)
+	Super::StopJumping();
+
+	switch (CharacterState->GetState())
 	{
-	case EMoveMode::MOVE_World:
-	{
-		break;
+	case EState::STATE_Vapor:
+	case EState::STATE_Ice:
+		CMC->Velocity.X = PreJumpVelocity.X;
+		CMC->Velocity.Y = PreJumpVelocity.Y;
+
+	default:
+		CMC->Velocity.X = PreJumpVelocity.X * 0.6f;
+		CMC->Velocity.Y = PreJumpVelocity.Y * 0.6f;
 	}
 
-	case EMoveMode::MOVE_Game:
+	if (PreJumpVelocity.Z >= 0.00001f)
 	{
-		Super::StopJumping();
-
-		switch (CharacterState->GetState())
-		{
-		case EState::STATE_Vapor:
-		case EState::STATE_Ice:
-			CMC->Velocity.X = PreJumpVelocity.X;
-			CMC->Velocity.Y = PreJumpVelocity.Y;
-
-		default:
-			CMC->Velocity.X = PreJumpVelocity.X * 0.6f;
-			CMC->Velocity.Y = PreJumpVelocity.Y * 0.6f;
-		}
-
-		if (PreJumpVelocity.Z >= 0.00001f)
-		{
-			CMC->JumpZVelocity = PreJumpVelocity.Z;
-		}
-
-		FInputActionValue moveValue = InputSubSystem->GetPlayerInput()->GetActionValue(MoveAction);
-		if (moveValue.IsNonZero())
-		{
-			Move(moveValue);
-		}
+		CMC->JumpZVelocity = PreJumpVelocity.Z;
 	}
+
+	FInputActionValue moveValue = InputSubSystem->GetPlayerInput()->GetActionValue(MoveAction);
+	if (moveValue.IsNonZero())
+	{
+		Move(moveValue);
 	}
 }
 
 void AProjectWaterCharacter::Move(const FInputActionValue& Value)
 {
-	switch (MoveMode)
+	if (bIgnoreInput)
 	{
-	case EMoveMode::MOVE_World:
-	{
-		
-		break;
+		return;
 	}
-	
-	case EMoveMode::MOVE_Game:
+
+	// input is a Vector2D
+	FVector2D MovementVector = Value.Get<FVector2D>();
+
+	if (Controller != nullptr)
 	{
-		if (bIgnoreInput)
-		{
-			return;
-		}
+		// find out which way is forward
+		const FRotator Rotation = Controller->GetControlRotation();
+		const FRotator YawRotation(0, Rotation.Yaw, 0);
 
-		// input is a Vector2D
-		FVector2D MovementVector = Value.Get<FVector2D>();
+		// get forward vector
+		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 
-		if (Controller != nullptr)
-		{
-			// find out which way is forward
-			const FRotator Rotation = Controller->GetControlRotation();
-			const FRotator YawRotation(0, Rotation.Yaw, 0);
+		// get right vector 
+		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-			// get forward vector
-			const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-
-			// get right vector 
-			const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
-
-			// add movement 
-			AddMovementInput(ForwardDirection, MovementVector.Y);
-			AddMovementInput(RightDirection, MovementVector.X);
-		}
-		break;
-	}
+		// add movement 
+		AddMovementInput(ForwardDirection, MovementVector.Y);
+		AddMovementInput(RightDirection, MovementVector.X);
 	}
 }
 
 void AProjectWaterCharacter::Look(const FInputActionValue& Value)
 {
-	switch (MoveMode)
+	if (bIgnoreInput)
 	{
-	case EMoveMode::MOVE_Game:
-	{
-		if (bIgnoreInput)
-		{
-			return;
-		}
-
-		// input is a Vector2D
-		FVector2D LookAxisVector = Value.Get<FVector2D>();
-
-		if (Controller != nullptr)
-		{
-			// add yaw and pitch input to controller
-			AddControllerYawInput(LookAxisVector.X);
-			AddControllerPitchInput(LookAxisVector.Y);
-		}
+		return;
 	}
+
+	// input is a Vector2D
+	FVector2D LookAxisVector = Value.Get<FVector2D>();
+
+	if (Controller != nullptr)
+	{
+		// add yaw and pitch input to controller
+		AddControllerYawInput(LookAxisVector.X);
+		AddControllerPitchInput(LookAxisVector.Y);
 	}
 }

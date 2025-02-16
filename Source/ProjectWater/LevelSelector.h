@@ -16,7 +16,7 @@ class PROJECTWATER_API ULevelSelector : public UUserWidget
 	GENERATED_BODY()
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	TMap<FString, int32> LevelNames;
+	TMap<FString, UTexture2D*> LevelTextures;
 
 public:
 	ULevelSelector(const FObjectInitializer& ObjectInitializer);
