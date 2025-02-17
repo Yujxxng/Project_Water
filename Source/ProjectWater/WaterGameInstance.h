@@ -3,6 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemComponent.h"
+#include "ItemDataTable.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Engine/GameInstance.h"
 #include "WaterGameInstance.generated.h"
 
@@ -22,9 +25,18 @@ public:
 	void SaveGame();
 	void LoadGame();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	class UDataTable* ItemDataTable;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	TArray<FPlayerCollect> PlayerItem;
+
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	TArray<bool> LockedStates;
 	
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int HeartNum;
+
+	UFUNCTION(BlueprintCallable)
+	bool IsItemCollected(FString ItemID);
 };

@@ -15,7 +15,12 @@ class PROJECTWATER_API AWaterGameMode : public AGameModeBase
 	GENERATED_BODY()
 	
 public:
+	AWaterGameMode();
+	virtual void BeginPlay() override;
+
 	UFUNCTION(BlueprintCallable)
 	void UpdateStates();
 
+	UFUNCTION(BlueprintCallable)
+	void UpdateCollector(FString ItemID);
 };

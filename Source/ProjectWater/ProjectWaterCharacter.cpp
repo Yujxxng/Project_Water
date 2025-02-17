@@ -12,6 +12,7 @@
 #include "InputActionValue.h"
 
 #include "CharacterState.h"
+#include "ItemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/DamageEvents.h"
 
@@ -67,6 +68,7 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	
 	// Create a character state
 	CharacterState = CreateDefaultSubobject<UCharacterState>(TEXT("CharacterState"));
+	CharacterCollector = CreateDefaultSubobject<UItemComponent>(TEXT("Item"));
 
 	LoadData();
 }
