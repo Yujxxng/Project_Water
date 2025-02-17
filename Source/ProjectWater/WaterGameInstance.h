@@ -21,7 +21,7 @@ public:
 	UWaterGameInstance();
 
 	virtual void Init() override;
-	void CreateSaveFile();
+
 	void SaveGame();
 	void LoadGame();
 
@@ -37,8 +37,11 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int HeartNum;
 
-	UPROPERTY(BlueprintReadWrite. VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int MapLock;
+
+	UFUNCTION(BlueprintCallable)
+	void CreateSaveFile();
 
 	UFUNCTION(BlueprintCallable)
 	bool IsItemCollected(FString ItemID);
