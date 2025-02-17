@@ -32,4 +32,5 @@ USaveGameData::USaveGameData()
 	LockedStates.Add(true);
 
 	HeartNum = 3;
+	MapLock = 0;
 }

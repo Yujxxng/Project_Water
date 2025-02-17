@@ -23,4 +23,7 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateCollector(FString ItemID);
+
+	UFUNCTION(BlueprintCallable)
+	void UpdateMapLock(int MapLockNum);
 };

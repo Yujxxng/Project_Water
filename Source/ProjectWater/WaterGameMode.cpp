@@ -65,3 +65,18 @@ void AWaterGameMode::UpdateCollector(FString itemID)
 	else
 		UE_LOG(LogTemp, Warning, TEXT("Fail to Get GameInstance in WaterGameMode"));
 }
+
+void AWaterGameMode::UpdateMapLock(int MapLockNum)
+{
+	if (auto waterGameInstance = Cast<UWaterGameInstance>(GetGameInstance()))
+	{
+		ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
+		if (PlayerCharacter)
+			waterGameInstance->MapLock++;
+	
+		waterGameInstance->SaveGame();
+		UE_LOG(LogTemp, Warning, TEXT("Save Map Process"));
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("Fail to Get GameInstance in WaterGameMode"));
+}

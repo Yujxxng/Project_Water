@@ -27,4 +27,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	int HeartNum;
+
+	UPROPERTY(VisibleAnywhere)
+	int MapLock;
 };
