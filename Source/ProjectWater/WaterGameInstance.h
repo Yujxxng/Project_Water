@@ -37,7 +37,7 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int HeartNum;
 
-	UPROPERTY(BlueprintReadWrite. VisibleAnywhere)
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int MapLock;
 
 	UFUNCTION(BlueprintCallable)
