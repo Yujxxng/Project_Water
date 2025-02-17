@@ -37,6 +37,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int HeartNum;
 
+	UPROPERTY(BlueprintReadWrite. VisibleAnywhere)
+	int MapLock;
+
 	UFUNCTION(BlueprintCallable)
 	bool IsItemCollected(FString ItemID);
 };

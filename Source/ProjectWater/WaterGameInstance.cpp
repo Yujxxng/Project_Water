@@ -69,6 +69,7 @@ void UWaterGameInstance::SaveGame()
 	{
 		dataToSave->LockedStates = this->LockedStates;
 		dataToSave->HeartNum = this->HeartNum;
+		dataToSave->MapLock = this->MapLock;
 		dataToSave->PlayerItem = this->PlayerItem;
 
 		UGameplayStatics::SaveGameToSlot(dataToSave, "Slot1", 0);
@@ -89,6 +90,7 @@ void UWaterGameInstance::LoadGame()
 	{
 		this->LockedStates = dataToLoad->LockedStates;
 		this->HeartNum = dataToLoad->HeartNum;
+		this->MapLock = dataToLoad->MapLock;
 		this->PlayerItem = dataToLoad->PlayerItem;
 	}
 	else if (!UGameplayStatics::DoesSaveGameExist("Slot1", 0))
