@@ -15,12 +15,16 @@ ULevelSelector::ULevelSelector(const FObjectInitializer& ObjectInitializer)
 		TEXT("Vapor_1"),
 	};
 
-	for (const FString& levelName : levelNames)
+	for (int i = 0; i < NUM_LEVEL; i++)
 	{
+		LevelInfos.Add(FLevelInformation());
+
+		LevelInfos[i].Name = levelNames[i];
+
 		ConstructorHelpers::FObjectFinder<UTexture2D> texture(TEXT("/Game/Textures/jumpdecal.jumpdecal"));
-		LevelTextures.Add(levelName, texture.Object);
+		LevelInfos[i].Texture = texture.Object;
 	}
 
 	ConstructorHelpers::FObjectFinder<UTexture2D> tmp(TEXT("/Game/Textures/heart.heart"));
-	LevelTextures.Add(TEXT("Human_1"), tmp.Object);
+	LevelInfos[0].Texture = tmp.Object;
 }
