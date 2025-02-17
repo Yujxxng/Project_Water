@@ -1,0 +1,22 @@
+[
+	{
+		"Name": "NewRow",
+		"ID": "Human_1",
+		"IsCollected": false,
+		"Textures": [
+			"/Script/Engine.Texture2D'/Game/Textures/profile_human.profile_human'",
+			"/Script/Engine.Texture2D'/Game/Textures/heart.heart'"
+		],
+		"Mesh": "/Script/Engine.StaticMesh'/Game/StaticMeshes/SM_Sphere.SM_Sphere'"
+	},
+	{
+		"Name": "NewRow_0",
+		"ID": "Human_2",
+		"IsCollected": false,
+		"Textures": [
+			"/Script/Engine.Texture2D'/Game/Textures/profile_human.profile_human'",
+			"/Script/Engine.Texture2D'/Game/Characters/Mannequins/Textures/Shared/T_UE_Logo_M.T_UE_Logo_M'"
+		],
+		"Mesh": "/Script/Engine.StaticMesh'/Game/LevelPrototyping/Meshes/SM_Cylinder.SM_Cylinder'"
+	}
+]

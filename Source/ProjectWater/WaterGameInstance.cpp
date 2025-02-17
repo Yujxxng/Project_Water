@@ -7,6 +7,28 @@
 
 UWaterGameInstance::UWaterGameInstance()
 {
+	static ConstructorHelpers::FObjectFinder<UDataTable> ItemData(TEXT("/Game/CollectorBook/DT_ItemTable"));
+	if (ItemData.Succeeded())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("DataTable Succeed!"));
+		ItemDataTable = ItemData.Object;
+		for (auto& Row : ItemDataTable->GetRowMap())
+		{
+			FItemTableRow* Item = (FItemTableRow*)Row.Value;
+			if (Item)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *Item->Name);
+				FPlayerCollect pc;
+				pc.ID = Item->ID;
+				pc.IsCollected = false;
+
+				PlayerItem.Add(pc);
+			}
+		}
+	}
+	else
+		UE_LOG(LogTemp, Warning, TEXT("DataTable Fail"));
+
 	LockedStates.Add(true);
 	LockedStates.Add(true);
 	LockedStates.Add(true);
@@ -20,6 +42,14 @@ void UWaterGameInstance::Init()
 
 	//Load the game upon initializing the WaterGameInstance
 	LoadGame();
+
+	//if (ItemDataTable != nullptr)
+	//{
+	//	auto DataList = ItemDataTable->GetRowNames();
+	//	FName tempname = DataList[1];
+	//	FItemTableRow* Itemtable = ItemDataTable->FindRow<FItemTableRow>(tempname, FString(""));
+	//	UE_LOG(LogTemp, Log, TEXT("%s , %s"), *(Itemtable->ID), *(Itemtable->Name));
+	//}
 }
 
 void UWaterGameInstance::CreateSaveFile()
@@ -39,6 +69,9 @@ void UWaterGameInstance::SaveGame()
 	{
 		dataToSave->LockedStates = this->LockedStates;
 		dataToSave->HeartNum = this->HeartNum;
+		dataToSave->MapLock = this->MapLock;
+		dataToSave->PlayerItem = this->PlayerItem;
+
 		UGameplayStatics::SaveGameToSlot(dataToSave, "Slot1", 0);
 	}
 	else if (!UGameplayStatics::DoesSaveGameExist("Slot1", 0))
@@ -57,9 +90,22 @@ void UWaterGameInstance::LoadGame()
 	{
 		this->LockedStates = dataToLoad->LockedStates;
 		this->HeartNum = dataToLoad->HeartNum;
+		this->MapLock = dataToLoad->MapLock;
+		this->PlayerItem = dataToLoad->PlayerItem;
 	}
 	else if (!UGameplayStatics::DoesSaveGameExist("Slot1", 0))
 	{
 		CreateSaveFile();
 	}
+}
+
+bool UWaterGameInstance::IsItemCollected(FString ItemID)
+{
+	for (int i = 0; i < PlayerItem.Num(); i++)
+	{
+		if (PlayerItem[i].ID == ItemID)
+			return PlayerItem[i].IsCollected;
+	}
+
+	return false;
 }

@@ -3,6 +3,8 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ItemComponent.h"
+#include "ItemDataTable.h"
 #include "GameFramework/SaveGame.h"
 #include "SaveGameData.generated.h"
 
@@ -18,8 +20,14 @@ public:
 	USaveGameData();
 
 	UPROPERTY(VisibleAnywhere)
+	TArray<FPlayerCollect> PlayerItem;
+
+	UPROPERTY(VisibleAnywhere)
 	TArray<bool> LockedStates;
 
 	UPROPERTY(VisibleAnywhere)
 	int HeartNum;
+
+	UPROPERTY(VisibleAnywhere)
+	int MapLock;
 };
