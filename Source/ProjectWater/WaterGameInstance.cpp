@@ -17,7 +17,6 @@ UWaterGameInstance::UWaterGameInstance()
 			FItemTableRow* Item = (FItemTableRow*)Row.Value;
 			if (Item)
 			{
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *Item->Name);
 				FPlayerCollect pc;
 				pc.ID = Item->ID;
 				pc.IsCollected = false;
@@ -34,6 +33,21 @@ UWaterGameInstance::UWaterGameInstance()
 	LockedStates.Add(true);
 
 	HeartNum = 3;
+
+	TArray<FString> levelNames = {
+		TEXT("Human_1"),
+		TEXT("Human_2"),
+		TEXT("Human_3"),
+		TEXT("Water_1"),
+		TEXT("Ice_1"),
+		TEXT("Vapor_1"),
+	};
+
+	for (int i = 0; i < NUM_LEVEL; i++)
+	{
+		LevelClear.Add(false);
+		LevelName.Add(levelNames[i]);
+	}
 }
 
 void UWaterGameInstance::Init()
@@ -42,14 +56,6 @@ void UWaterGameInstance::Init()
 
 	//Load the game upon initializing the WaterGameInstance
 	LoadGame();
-
-	//if (ItemDataTable != nullptr)
-	//{
-	//	auto DataList = ItemDataTable->GetRowNames();
-	//	FName tempname = DataList[1];
-	//	FItemTableRow* Itemtable = ItemDataTable->FindRow<FItemTableRow>(tempname, FString(""));
-	//	UE_LOG(LogTemp, Log, TEXT("%s , %s"), *(Itemtable->ID), *(Itemtable->Name));
-	//}
 }
 
 void UWaterGameInstance::CreateSaveFile()
@@ -71,6 +77,7 @@ void UWaterGameInstance::SaveGame()
 		dataToSave->HeartNum = this->HeartNum;
 		dataToSave->MapLock = this->MapLock;
 		dataToSave->PlayerItem = this->PlayerItem;
+		dataToSave->LevelClear = this->LevelClear;
 
 		UGameplayStatics::SaveGameToSlot(dataToSave, "Slot1", 0);
 	}
@@ -92,6 +99,7 @@ void UWaterGameInstance::LoadGame()
 		this->HeartNum = dataToLoad->HeartNum;
 		this->MapLock = dataToLoad->MapLock;
 		this->PlayerItem = dataToLoad->PlayerItem;
+		this->LevelClear = dataToLoad->LevelClear;
 	}
 	else if (!UGameplayStatics::DoesSaveGameExist("Slot1", 0))
 	{
@@ -108,4 +116,15 @@ bool UWaterGameInstance::IsItemCollected(FString ItemID)
 	}
 
 	return false;
+}
+
+int UWaterGameInstance::GetLevelIndex(FString _LevelName)
+{
+	for (int i = 0; i < NUM_LEVEL; i++)
+	{
+		if (_LevelName == LevelName[i])
+			return i;
+	}
+
+	return -1;
 }

@@ -33,4 +33,7 @@ USaveGameData::USaveGameData()
 
 	HeartNum = 3;
 	MapLock = 0;
+
+	for (int i = 0; i < NUM_LEVEL; i++)
+		LevelClear.Add(false);
 }

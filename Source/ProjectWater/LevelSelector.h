@@ -3,15 +3,17 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "WaterGameInstance.h"
 #include "Blueprint/UserWidget.h"
 #include "LevelSelector.generated.h"
-
-#define NUM_LEVEL 6
 
 USTRUCT(BlueprintType)
 struct FLevelInformation
 {
 	GENERATED_BODY()
+
+	UPROPERTY(BlueprintReadWrite)
+	bool isClear;
 
 	UPROPERTY(BlueprintReadOnly)
 	FString Name;
@@ -33,5 +35,10 @@ class PROJECTWATER_API ULevelSelector : public UUserWidget
 
 public:
 	ULevelSelector(const FObjectInitializer& ObjectInitializer);
-	
+
+	UFUNCTION(BlueprintCallable)
+	bool IsLevelClear(int idx) { return LevelInfos[idx].isClear; }
+
+	UFUNCTION(BlueprintCallable)
+	void LoadLevelInfo();
 };
