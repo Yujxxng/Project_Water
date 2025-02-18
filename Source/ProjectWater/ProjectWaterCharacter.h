@@ -124,6 +124,8 @@ public:
 	UFUNCTION(BlueprintSetter)
 	void SetIgnoreInput(bool b);
 
+	FInputActionValue GetPlayerInputActionValue() const;
+
 	UFUNCTION(BlueprintCallable)
 	int GetMaxHearts() const { return MaxHearts; }
 	UFUNCTION(BlueprintCallable)
