@@ -104,6 +104,11 @@ void AProjectWaterCharacter::SetIgnoreInput(bool b)
 	bIgnoreInput = b;
 }
 
+FInputActionValue AProjectWaterCharacter::GetPlayerInputActionValue() const
+{
+	return InputSubSystem->GetPlayerInput()->GetActionValue(MoveAction);
+}
+
 void AProjectWaterCharacter::HealHearts(int num)
 {
 	Hearts += num;

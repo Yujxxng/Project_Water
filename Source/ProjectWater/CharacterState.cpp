@@ -8,6 +8,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "Components/CapsuleComponent.h"
+#include "Materials/MaterialInterface.h"
 
 // Sets default values for this component's properties
 UCharacterState::UCharacterState()
@@ -100,12 +101,18 @@ void UCharacterState::TickComponent(float DeltaTime, ELevelTick TickType, FActor
 
 void UCharacterState::SetState(EState newState)
 {
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> waterMaterial(TEXT("/Game/Materials/States/M_Water_Inst.M_Water_Inst"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> vaporMaterial(TEXT("/Game/Materials/States/M_Vapor_Inst.M_Vapor_Inst"));
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> iceMaterial(TEXT("/Game/Materials/States/M_Ice_Inst.M_Ice_Inst"));
+
 	if (bExhausted || State == newState ||
 		(newState != EState::STATE_Human && LockedState[int(newState) - 2]))
 	{
 		UE_LOG(LogTemp, Log, TEXT("SetState fail %d"), newState);
 		return;
 	}
+
+	UMaterialInterface* material = nullptr;
 
 	switch (newState)
 	{
@@ -131,6 +138,7 @@ void UCharacterState::SetState(EState newState)
 		MovementComponent->AirControl = 0.3f;
 		MovementComponent->GravityScale = 1.75f;
 		MovementComponent->Mass = 100.f;
+		material = waterMaterial.Object;
 		break;
 
 	case EState::STATE_Vapor:
@@ -143,6 +151,7 @@ void UCharacterState::SetState(EState newState)
 		MovementComponent->AirControl = 1.f;
 		MovementComponent->GravityScale = 0.5f;
 		MovementComponent->Mass = 1.f;
+		material = vaporMaterial.Object;
 		break;
 
 	case EState::STATE_Ice:
@@ -155,6 +164,7 @@ void UCharacterState::SetState(EState newState)
 		MovementComponent->AirControl = 0.3f;
 		MovementComponent->GravityScale = 1.75f;
 		MovementComponent->Mass = 100.f;
+		material = iceMaterial.Object;
 		break;
 	}
 
@@ -172,6 +182,8 @@ void UCharacterState::SetState(EState newState)
 		default:
 			Owner->GetCapsuleComponent()->SetCollisionProfileName("SolidState");
 	}
+
+	Owner->GetMesh()->SetOverlayMaterial(material);
 }
 
 void UCharacterState::UnlockState(EState unlock)
