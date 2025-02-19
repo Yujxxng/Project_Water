@@ -9,6 +9,7 @@
 #include "Engine/GameInstance.h"
 #include "WaterGameInstance.generated.h"
 
+#define NUM_LEVEL 6
 /**
  * 
  */
@@ -40,9 +41,15 @@ public:
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int MapLock;
 
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	TArray<bool> LevelClear;
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	TArray<FString> LevelName;
+
 	UFUNCTION(BlueprintCallable)
 	void CreateSaveFile();
 
 	UFUNCTION(BlueprintCallable)
 	bool IsItemCollected(FString ItemID);
+	int GetLevelIndex(FString _LevelName);
 };

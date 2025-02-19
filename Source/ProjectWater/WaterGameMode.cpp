@@ -6,6 +6,8 @@
 #include "Kismet/GameplayStatics.h"
 #include "ProjectWaterCharacter.h"
 #include "CharacterState.h"
+#include "LevelSelector.h"
+
 AWaterGameMode::AWaterGameMode()
 {
 	
@@ -66,16 +68,21 @@ void AWaterGameMode::UpdateCollector(FString itemID)
 		UE_LOG(LogTemp, Warning, TEXT("Fail to Get GameInstance in WaterGameMode"));
 }
 
-void AWaterGameMode::UpdateMapLock(int MapLockNum)
+void AWaterGameMode::UpdateMapLock(FString LevelName)
 {
 	if (auto waterGameInstance = Cast<UWaterGameInstance>(GetGameInstance()))
 	{
-		ACharacter* PlayerCharacter = UGameplayStatics::GetPlayerCharacter(this, 0);
-		if (PlayerCharacter)
-			waterGameInstance->MapLock++;
-	
-		waterGameInstance->SaveGame();
-		UE_LOG(LogTemp, Warning, TEXT("Save Map Process"));
+		int LvIdx = waterGameInstance->GetLevelIndex(LevelName);
+		if(LvIdx >= 0)
+		{
+			if (!waterGameInstance->LevelClear[LvIdx])
+			{
+				waterGameInstance->LevelClear[LvIdx] = true;
+				waterGameInstance->MapLock++;
+				waterGameInstance->SaveGame();
+				UE_LOG(LogTemp, Warning, TEXT("Save Map Process"));
+			}
+		}
 	}
 	else
 		UE_LOG(LogTemp, Warning, TEXT("Fail to Get GameInstance in WaterGameMode"));

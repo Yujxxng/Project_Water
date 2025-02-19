@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "ItemComponent.h"
 #include "ItemDataTable.h"
+#include "LevelSelector.h"
 #include "GameFramework/SaveGame.h"
 #include "SaveGameData.generated.h"
 
@@ -30,4 +31,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere)
 	int MapLock;
+
+	UPROPERTY(VisibleAnywhere)
+	TArray<bool> LevelClear;
 };
