@@ -39,6 +39,7 @@ UWaterGameInstance::UWaterGameInstance()
 		TEXT("Human_2"),
 		TEXT("Human_3"),
 		TEXT("Water_1"),
+		TEXT("Water_2"),
 		TEXT("Ice_1"),
 		TEXT("Vapor_1"),
 	};

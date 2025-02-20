@@ -9,7 +9,7 @@
 #include "Engine/GameInstance.h"
 #include "WaterGameInstance.generated.h"
 
-#define NUM_LEVEL 6
+#define NUM_LEVEL 7
 /**
  * 
  */
