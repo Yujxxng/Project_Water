@@ -14,15 +14,19 @@ ULevelSelector::ULevelSelector(const FObjectInitializer& ObjectInitializer)
 		{
 			LevelInfos.Add(FLevelInformation());
 			LevelInfos[i].Name = GameInstance->LevelName[i];
+			
+			FString path;
+			path.Append("/Game/Materials/Textures/MapPreview/");
+			path.Append(LevelInfos[i].Name);
+			path.Append(".");
+			path.Append(LevelInfos[i].Name);
 			//LevelInfos[i].isClear = GameInstance->LevelClear[i];
 			//LevelInfos[i].isClear = false;
 
-			ConstructorHelpers::FObjectFinder<UTexture2D> texture(TEXT("/Game/Textures/jumpdecal.jumpdecal"));
+			ConstructorHelpers::FObjectFinder<UTexture2D> texture(*path);
 			LevelInfos[i].Texture = texture.Object;
 
 		}
-		ConstructorHelpers::FObjectFinder<UTexture2D> tmp(TEXT("/Game/Textures/heart.heart"));
-		LevelInfos[0].Texture = tmp.Object;
 	}
 	else
 	{
