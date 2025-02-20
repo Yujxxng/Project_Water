@@ -14,7 +14,8 @@ ULevelSelector::ULevelSelector(const FObjectInitializer& ObjectInitializer)
 		{
 			LevelInfos.Add(FLevelInformation());
 			LevelInfos[i].Name = GameInstance->LevelName[i];
-			LevelInfos[i].isClear = GameInstance->LevelClear[i];
+			//LevelInfos[i].isClear = GameInstance->LevelClear[i];
+			LevelInfos[i].isClear = false;
 
 			ConstructorHelpers::FObjectFinder<UTexture2D> texture(TEXT("/Game/Textures/jumpdecal.jumpdecal"));
 			LevelInfos[i].Texture = texture.Object;
@@ -23,6 +24,8 @@ ULevelSelector::ULevelSelector(const FObjectInitializer& ObjectInitializer)
 		ConstructorHelpers::FObjectFinder<UTexture2D> tmp(TEXT("/Game/Textures/heart.heart"));
 		LevelInfos[0].Texture = tmp.Object;
 	}
+
+	
 }
 
 void ULevelSelector::LoadLevelInfo()
