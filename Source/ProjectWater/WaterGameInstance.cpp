@@ -47,9 +47,10 @@ UWaterGameInstance::UWaterGameInstance()
 		TEXT("Vapor_2_4"),
 	};
 
-	for (int i = 0; i < NUM_LEVEL; i++)
+	LevelClear.Init(false, 9);
+	for (int i = 0; i < 9; i++)
 	{
-		LevelClear.Add(false);
+		//LevelClear.Add(false);
 		LevelName.Add(levelNames[i]);
 
 	}
