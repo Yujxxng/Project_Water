@@ -24,6 +24,8 @@ public:
 	virtual void Init() override;
 
 	void SaveGame();
+
+	UFUNCTION(BlueprintCallable)
 	void LoadGame();
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)

@@ -23,12 +23,12 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 AProjectWaterCharacter::AProjectWaterCharacter()
 	: InputSubSystem(nullptr)
-	, PreJumpVelocity()
 	, bIgnoreInput(false)
+	, PreJumpVelocity()
 	, MaxHearts(3), Hearts(MaxHearts)
 	, NumKeys(0)
 	, MaxOxygen(100.f), Oxygen(MaxOxygen), OxygenUsage(2.f)
-	, OxygenCheckInterval(1000), bOxygenStart(true), UseOxygenStart()
+	, bOxygenStart(true), OxygenCheckInterval(1000), UseOxygenStart()
 {	
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(35.f, 90.f);
