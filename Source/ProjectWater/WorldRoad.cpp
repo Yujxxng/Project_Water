@@ -14,7 +14,7 @@
 // Sets default values
 AWorldRoad::AWorldRoad()
 	: Player(nullptr)
-	, Offset(30.f), Spacing(0.f), Multiplier(0.1f)
+	, Spacing(0.f), Multiplier(0.1f), Offset(30.f)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;

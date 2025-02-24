@@ -13,11 +13,11 @@
 // Sets default values for this component's properties
 UCharacterState::UCharacterState()
 	: Owner(nullptr), MovementComponent(nullptr)
-	, State(EState::STATE_Human)
+	, isCharacterStateChanged(false), State(EState::STATE_Human)
 	, MaxEnergy(100.f), Energy(MaxEnergy)
 	, EnergyRecovery(0.3f), EnergyUsage(0.2f)
 	, EnergyCheckInterval(200), EnergyTimerStart()
-	, bExhausted(false), isCharacterStateChanged(false)
+	, bExhausted(false)
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
