@@ -34,6 +34,7 @@ UWaterGameInstance::UWaterGameInstance()
 	LockedStates.Add(true);
 
 	HeartNum = 3;
+	AudioVolume = 1.0f;
 
 	TArray<FString> levelNames = {
 		TEXT("Human_1"),
@@ -137,6 +138,16 @@ bool UWaterGameInstance::IsItemCollected(FString ItemID)
 	}
 
 	return false;
+}
+
+void UWaterGameInstance::SetAudioVolume(float value)
+{
+	if (value < 0)
+		AudioVolume = 0;
+	else if (value > 1)
+		AudioVolume = 1;
+	else
+		AudioVolume = value;
 }
 
 int UWaterGameInstance::GetLevelIndex(FString _LevelName)

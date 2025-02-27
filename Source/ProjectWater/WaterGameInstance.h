@@ -46,6 +46,9 @@ public:
 	int CurrentLevelIdx;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	float AudioVolume;
+
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	TArray<bool> LevelClear;
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	TArray<FString> LevelName;
@@ -57,5 +60,11 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	bool IsItemCollected(FString ItemID);
+
+	UFUNCTION(BlueprintCallable)
+	void SetAudioVolume(float value);
+	UFUNCTION(BlueprintCallable)
+	float GetAudioVolume() { return AudioVolume; }
+
 	int GetLevelIndex(FString _LevelName);
 };
