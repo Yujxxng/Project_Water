@@ -42,11 +42,15 @@ public:
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	int MapLock;
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	int CurrentLevelIdx;
 
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	TArray<bool> LevelClear;
 	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
 	TArray<FString> LevelName;
+	UPROPERTY(BlueprintReadWrite, VisibleAnywhere)
+	TArray<FString> LevelDisplayName;
 
 	UFUNCTION(BlueprintCallable)
 	void CreateSaveFile();

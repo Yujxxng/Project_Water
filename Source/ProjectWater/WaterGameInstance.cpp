@@ -6,6 +6,7 @@
 #include "SaveGameData.h"
 
 UWaterGameInstance::UWaterGameInstance()
+	: CurrentLevelIdx(0)
 {
 	static ConstructorHelpers::FObjectFinder<UDataTable> ItemData(TEXT("/Game/CollectorBook/DT_ItemTable"));
 	if (ItemData.Succeeded())
@@ -47,12 +48,24 @@ UWaterGameInstance::UWaterGameInstance()
 		TEXT("Vapor_2_4"),
 	};
 
+	TArray<FString> displayNames = {
+		TEXT("Two Slopes@2개의 오르막길"),
+		TEXT("Moving Path@움직이는 길"),
+		TEXT("Connecting Paths@길을 잇는 것"),
+		TEXT("Water Guide@물의 인도"),
+		TEXT("Slippery Ice@빙판 조심"),
+		TEXT("Light Steps@가벼운 발걸음"),
+		TEXT("Rising Power@떠오르는 힘"),
+		TEXT("Ride the Flow@흐름에 태우고"),
+		TEXT("Timing for Success@성공의 타이밍"),
+	};
+
 	LevelClear.Init(false, 9);
 	for (int i = 0; i < 9; i++)
 	{
 		//LevelClear.Add(false);
 		LevelName.Add(levelNames[i]);
-
+		LevelDisplayName.Add(displayNames[i]);
 	}
 
 	

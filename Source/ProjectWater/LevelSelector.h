@@ -19,6 +19,9 @@ struct FLevelInformation
 	FString Name;
 
 	UPROPERTY(BlueprintReadOnly)
+	FString DisplayName;
+
+	UPROPERTY(BlueprintReadOnly)
 	UTexture2D* Texture;
 };
 

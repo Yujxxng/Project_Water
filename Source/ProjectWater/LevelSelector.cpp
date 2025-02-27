@@ -14,18 +14,16 @@ ULevelSelector::ULevelSelector(const FObjectInitializer& ObjectInitializer)
 		{
 			LevelInfos.Add(FLevelInformation());
 			LevelInfos[i].Name = GameInstance->LevelName[i];
+
+			LevelInfos[i].DisplayName = GameInstance->LevelDisplayName[i];
 			
 			FString path;
 			path.Append("/Game/Materials/Textures/MapPreview/");
 			path.Append(LevelInfos[i].Name);
 			path.Append(".");
 			path.Append(LevelInfos[i].Name);
-			//LevelInfos[i].isClear = GameInstance->LevelClear[i];
-			//LevelInfos[i].isClear = false;
-
 			ConstructorHelpers::FObjectFinder<UTexture2D> texture(*path);
 			LevelInfos[i].Texture = texture.Object;
-
 		}
 	}
 	else
