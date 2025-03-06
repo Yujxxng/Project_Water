@@ -374,5 +374,18 @@ void AProjectWaterCharacter::Look(const FInputActionValue& Value)
 
 void AProjectWaterCharacter::Interact()
 {
-	UE_LOG(LogTemp, Log, TEXT("AProjectWaterCharacter Interact"));
+	//UE_LOG(LogTemp, Log, TEXT("AProjectWaterCharacter Interact"));
+
+	TArray<AActor*> overlappingActors;
+	GetOverlappingActors(overlappingActors);
+
+	for (AActor* actor : overlappingActors)
+	{
+		IInteract* interactVar = Cast<IInteract>(actor);
+		if (interactVar)
+		{
+			interactVar->Interact();
+			break;
+		}
+	}
 }
