@@ -264,6 +264,9 @@ void AProjectWaterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::Look);
+
+		// Interacting
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::Interact);
 	}
 	else
 	{
@@ -367,4 +370,9 @@ void AProjectWaterCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AProjectWaterCharacter::Interact()
+{
+	UE_LOG(LogTemp, Log, TEXT("AProjectWaterCharacter Interact"));
 }
