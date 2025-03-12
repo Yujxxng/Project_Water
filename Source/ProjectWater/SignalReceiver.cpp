@@ -18,6 +18,10 @@ void ASignalReceiver::BeginPlay()
 	
 }
 
+void ASignalReceiver::Interact() {
+
+}
+
 // Called every frame
 void ASignalReceiver::Tick(float DeltaTime)
 {

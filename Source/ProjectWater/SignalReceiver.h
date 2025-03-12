@@ -4,10 +4,12 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
+#include "Interact.h"
 #include "SignalReceiver.generated.h"
 
 UCLASS()
-class PROJECTWATER_API ASignalReceiver : public AActor
+class PROJECTWATER_API ASignalReceiver : public AActor, public IInteract
 {
 	GENERATED_BODY()
 	
@@ -18,6 +20,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	void Interact() override;
 
 public:	
 	// Called every frame
