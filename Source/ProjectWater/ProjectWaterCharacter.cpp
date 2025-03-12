@@ -84,8 +84,6 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 
 	Buoyancy_cpp->BuoyancyData.bCenterPontoonsOnCOM = true;
 	Buoyancy_cpp->BuoyancyData.Pontoons.Add(Pontoon);
-
-
 	LoadData();
 }
 
@@ -96,6 +94,14 @@ void AProjectWaterCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 	//LoadData();
+
+	if (Buoyancy_cpp)
+	{
+		FScriptDelegate Delegate;
+		Delegate.BindUFunction(this, FName("Delegate_Test"));
+
+		Buoyancy_cpp->OnEnteredWaterDelegate.Add(Delegate);
+	}
 }
 
 void AProjectWaterCharacter::SetEnableInput(bool b)
@@ -251,6 +257,11 @@ void AProjectWaterCharacter::MoveBlueprintTemp(FVector2D Value)
 		AddMovementInput(ForwardDirection, Value.Y);
 		AddMovementInput(RightDirection, Value.X);
 	}
+}
+
+void AProjectWaterCharacter::Delegate_Test(const FSphericalPontoon& Pontoon)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Delegate_Test"));
 }
 
 //////////////////////////////////////////////////////////////////////////

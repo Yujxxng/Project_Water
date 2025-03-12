@@ -9,6 +9,7 @@
 #include "BuoyancyComponent.h"
 #include <chrono>
 #include "Interact.h"
+#include "Swimming/WaterInteraction.h"
 #include "ProjectWaterCharacter.generated.h"
 
 class USpringArmComponent;
@@ -24,7 +25,7 @@ class UEnhancedInputLocalPlayerSubsystem;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config = Game)
-class AProjectWaterCharacter : public ACharacter, public IInteract
+class AProjectWaterCharacter : public ACharacter, public IInteract, public IWaterInteraction
 {
 	GENERATED_BODY()
 
@@ -177,5 +178,10 @@ public:
 	/* TEMP FUNCTION */
 	UFUNCTION(BlueprintCallable)
 	void MoveBlueprintTemp(FVector2D Value);
+
+
+	///////////////////Swimming////////////////////
+	UFUNCTION()
+	void Delegate_Test(const FSphericalPontoon& Pontoon);
 };
 
