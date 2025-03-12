@@ -8,6 +8,7 @@
 #include "WaterGameInstance.h"
 #include "BuoyancyComponent.h"
 #include <chrono>
+#include "Interact.h"
 #include "ProjectWaterCharacter.generated.h"
 
 class USpringArmComponent;
@@ -23,7 +24,7 @@ class UEnhancedInputLocalPlayerSubsystem;
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
 UCLASS(config = Game)
-class AProjectWaterCharacter : public ACharacter
+class AProjectWaterCharacter : public ACharacter, public IInteract
 {
 	GENERATED_BODY()
 
@@ -51,6 +52,10 @@ class AProjectWaterCharacter : public ACharacter
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	/** Look Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InteractAction;
+
 public:
 	AProjectWaterCharacter();
 
@@ -63,6 +68,8 @@ protected:
 
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
+
+	void Interact() override;
 
 
 protected:

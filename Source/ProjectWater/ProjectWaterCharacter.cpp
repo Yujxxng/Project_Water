@@ -280,6 +280,9 @@ void AProjectWaterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::Look);
+
+		// Interacting
+		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::Interact);
 	}
 	else
 	{
@@ -382,5 +385,23 @@ void AProjectWaterCharacter::Look(const FInputActionValue& Value)
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
+	}
+}
+
+void AProjectWaterCharacter::Interact()
+{
+	//UE_LOG(LogTemp, Log, TEXT("AProjectWaterCharacter Interact"));
+
+	TArray<AActor*> overlappingActors;
+	GetOverlappingActors(overlappingActors);
+
+	for (AActor* actor : overlappingActors)
+	{
+		IInteract* interactVar = Cast<IInteract>(actor);
+		if (interactVar)
+		{
+			interactVar->Interact();
+			break;
+		}
 	}
 }
