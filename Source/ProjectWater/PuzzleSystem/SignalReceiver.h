@@ -5,26 +5,31 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 
-#include "Interact.h"
 #include "SignalReceiver.generated.h"
 
-UCLASS()
-class PROJECTWATER_API ASignalReceiver : public AActor, public IInteract
-{
+UCLASS(Abstract)
+class PROJECTWATER_API ASignalReceiver : public AActor
+{	
 	GENERATED_BODY()
-	
+
 public:	
 	// Sets default values for this actor's properties
 	ASignalReceiver();
+
+private:
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	void Interact() override;
+	virtual void Activate() PURE_VIRTUAL(ASignalReceiver::Activate, );
+	virtual void Inactivate() PURE_VIRTUAL(ASignalReceiver::Inactivate, );
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	void ReceiveOnSignal();
+	void ReceiveOffSignal();
 
 };

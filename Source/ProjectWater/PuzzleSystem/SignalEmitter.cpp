@@ -2,6 +2,7 @@
 
 #include "SignalEmitter.h"
 #include "SignalReceiver.h"
+#include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -46,9 +47,9 @@ void ASignalEmitter::InitializeAttention()
 void ASignalEmitter::BeginPlay()
 {
 	Super::BeginPlay();
-	//PlayerMovement = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetCharacterMovement();
+	PlayerMovement = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetCharacterMovement();
 
-	//InitializeAttention();
+	InitializeAttention();
 }
 
 void ASignalEmitter::EmitOnSignal()
@@ -73,53 +74,72 @@ void ASignalEmitter::EmitOnSignal()
 
 void ASignalEmitter::EmitOffSignal()
 {
-	//if (!bActivated)
-	//	return;
+	if (!bActivated)
+		return;
 
-	//bActivating = false;
-	//bActivated = false;
+	bActivating = false;
+	bActivated = false;
 
-	//if (bOffAttention)
-	//{
-	//	if (!bRepeatAttention)
-	//	{
-	//		bOffAttention = false;
-	//	}
+	if (bOffAttention)
+	{
+		if (!bRepeatAttention)
+		{
+			bOffAttention = false;
+		}
 
-	//	PlayerMovement->Velocity = FVector::Zero();
-	//	// Call set second camera
-	//}
-	//else
-	//{
-	//	InactiveReceivers();
-	//}
+		PlayerMovement->Velocity = FVector::Zero();
+		// Call set second camera
+	}
+	else
+	{
+		InactiveReceivers();
+	}
 }
 
 void ASignalEmitter::ActiveReceivers()
 {
-	//if (bActivating)
-	//{
-	//	for (auto receiver : Receivers)
-	//	{
-	//		
-	//	}
+	if (bActivating)
+	{
+		PlaySound();
 
-	//	bActivating = false;
-	//	bActivated = true;
+		for (auto receiver : Receivers)
+		{
+			receiver->ReceiveOnSignal();
+		}
 
-	//	if (bOnAttention)
-	//	{
+		bActivating = false;
+		bActivated = true;
 
-	//	}
-	//}
-	//else
-	//{
-	//	// Call reset second camera
-	//}
+		if (bOnAttention)
+		{
+			//FTimerHandle activeReceiverHandle;
+			//GetWorld()->GetTimerManager().SetTimer(
+			//	activeReceiverHandle, this, ASignalEmitter::
+			//);
+			// Call reset second camera
+		}
+	}
+	else
+	{
+		// Call reset second camera
+	}
 }
 
 void ASignalEmitter::InactiveReceivers()
 {
+	for (auto receiver : Receivers)
+	{
+		receiver->ReceiveOffSignal();
+	}
+
+	if (bOffAttention)
+	{
+		//FTimerHandle activeReceiverHandle;
+		//GetWorld()->GetTimerManager().SetTimer(
+		//	activeReceiverHandle, this, ASignalEmitter::
+		//);
+		// Call reset second camera
+	}
 }
 
 // Called every frame

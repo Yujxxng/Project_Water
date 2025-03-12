@@ -8,7 +8,7 @@
 #include "WaterGameInstance.h"
 #include "BuoyancyComponent.h"
 #include <chrono>
-#include "Interact.h"
+#include "PuzzleSystem/Interact.h"
 #include "ProjectWaterCharacter.generated.h"
 
 class USpringArmComponent;

@@ -9,7 +9,7 @@
 class ASignalReceiver;
 class UCharacterMovementComponent;
 
-UCLASS()
+UCLASS(Abstract)
 class PROJECTWATER_API ASignalEmitter : public AActor
 {
 	GENERATED_BODY()
@@ -56,6 +56,8 @@ protected:
 
 	void ActiveReceivers();
 	void InactiveReceivers();
+
+	virtual void PlaySound() PURE_VIRTUAL(ASignalEmitter::PlaySound, );
 
 public:	
 	// Called every frame

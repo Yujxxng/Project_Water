@@ -18,8 +18,14 @@ void ASignalReceiver::BeginPlay()
 	
 }
 
-void ASignalReceiver::Interact() {
+void ASignalReceiver::ReceiveOnSignal()
+{
+	Activate();
+}
 
+void ASignalReceiver::ReceiveOffSignal()
+{
+	Inactivate();
 }
 
 // Called every frame
