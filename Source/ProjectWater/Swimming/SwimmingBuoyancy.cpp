@@ -26,6 +26,22 @@ ASwimmingBuoyancy::ASwimmingBuoyancy()
 	cubeMeshComponent->bVisibleInRealTimeSkyCaptures = false;
 	cubeMeshComponent->bVisibleInRayTracing = false;
 
+	//Set Collision Channel. Only Interact with Water
+	cubeMeshComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	cubeMeshComponent->SetCollisionResponseToChannel(ECC_PhysicsBody, ECR_Block);
+
+	//BuoyancyComponent = NewObject<UBuoyancyComponent>(this, TEXT("BuoyancyComponent"));
+	BuoyancyComponent = CreateDefaultSubobject<UBuoyancyComponent>(TEXT("BuoyancyComponent"));
+	//BuoyancyComponent->RegisterComponent();
+
+	FSphericalPontoon Pontoon = FSphericalPontoon();
+	Pontoon.CenterSocket = "MyPontoon";
+	Pontoon.RelativeLocation = FVector(0.f, 0.f, 0.f);
+	Pontoon.Radius = 100.f;
+	Pontoon.bFXEnabled = true;
+
+	BuoyancyComponent->BuoyancyData.bCenterPontoonsOnCOM = true;
+	BuoyancyComponent->BuoyancyData.Pontoons.Add(Pontoon);
 }
 
 // Called when the game starts or when spawned
@@ -40,5 +56,18 @@ void ASwimmingBuoyancy::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ASwimmingBuoyancy::SetXYPosition()
+{
+	//Retains buoyancy by keeping the same Z value but follows the player by setting the X and Y values of the cube to the player's.
+
+	if (IsValid(Player))
+	{
+		double X = Player->GetActorLocation().X;
+		double Y = Player->GetActorLocation().Y;
+		double Z = cubeMeshComponent->GetComponentLocation().Z;
+		cubeMeshComponent->SetWorldLocation(FVector(X, Y, Z));
+	}
 }
 

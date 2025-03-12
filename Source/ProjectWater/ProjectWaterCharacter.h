@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
 #include "WaterGameInstance.h"
+#include "BuoyancyComponent.h"
 #include <chrono>
 #include "ProjectWaterCharacter.generated.h"
 
@@ -80,6 +81,12 @@ public:
 
 	//////////////////////////////////////////////////////////////////////////
 	// Custom
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Swim, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* SwimEnterScene_cpp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Swim, meta = (AllowPrivateAccess = "true"))
+	USceneComponent* SwimBuoyancyScene_cpp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Swim, meta = (AllowPrivateAccess = "true"))
+	UBuoyancyComponent* Buoyancy_cpp;
 
 private:
 	TObjectPtr<UCharacterMovementComponent> CMC;

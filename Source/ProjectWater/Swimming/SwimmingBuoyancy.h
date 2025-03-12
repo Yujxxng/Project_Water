@@ -16,6 +16,9 @@ class PROJECTWATER_API ASwimmingBuoyancy : public AActor
 	UStaticMeshComponent* cubeMeshComponent;
 	UStaticMesh* cubeMesh;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	UBuoyancyComponent* BuoyancyComponent;
+	
 public:	
 	// Sets default values for this actor's properties
 	ASwimmingBuoyancy();
@@ -28,4 +31,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (ExposeOnSpawn = "true"))
+	APawn* Player;
+
+	void SetXYPosition();
 };

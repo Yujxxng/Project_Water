@@ -70,6 +70,22 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	CharacterState = CreateDefaultSubobject<UCharacterState>(TEXT("CharacterState"));
 	CharacterCollector = CreateDefaultSubobject<UItemComponent>(TEXT("Item"));
 
+	//Swim Component
+	SwimEnterScene_cpp = CreateDefaultSubobject<USceneComponent>(TEXT("SwimEnterScene_cpp"));
+	SwimEnterScene_cpp->SetRelativeLocation(FVector(50.f, 0.f, 70.f));
+	SwimBuoyancyScene_cpp = CreateDefaultSubobject<USceneComponent>(TEXT("SwimBuoyancyScene_cpp"));
+
+	Buoyancy_cpp = CreateDefaultSubobject<UBuoyancyComponent>(TEXT("Buoyancy_cpp"));
+	FSphericalPontoon Pontoon = FSphericalPontoon();
+	Pontoon.CenterSocket = "Pontoon";
+	Pontoon.RelativeLocation = FVector(0.f, 0.f, 100.f);
+	Pontoon.Radius = 25.f;
+	Pontoon.bFXEnabled = true;
+
+	Buoyancy_cpp->BuoyancyData.bCenterPontoonsOnCOM = true;
+	Buoyancy_cpp->BuoyancyData.Pontoons.Add(Pontoon);
+
+
 	LoadData();
 }
 
