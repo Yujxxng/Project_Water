@@ -132,6 +132,8 @@ public:
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
 	UItemComponent* CharacterCollector;
 
+	ACameraActor* AttentionCamera;
+
 	UFUNCTION(BlueprintCallable)
 	void SetEnableInput(bool b);
 

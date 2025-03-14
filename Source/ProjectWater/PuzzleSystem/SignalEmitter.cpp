@@ -10,7 +10,7 @@
 // Sets default values
 ASignalEmitter::ASignalEmitter()
 	: PlayerMovement(nullptr)
-	, bActivating(false), bActivated(false)
+	, bActive(false)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
@@ -54,7 +54,7 @@ void ASignalEmitter::BeginPlay()
 
 void ASignalEmitter::EmitOnSignal()
 {
-	bActivating = true;
+	bActive = true;
 
 	if (bOnAttention)
 	{
@@ -74,11 +74,10 @@ void ASignalEmitter::EmitOnSignal()
 
 void ASignalEmitter::EmitOffSignal()
 {
-	if (!bActivated)
+	if (!bActive)
 		return;
 
-	bActivating = false;
-	bActivated = false;
+	bActive = false;
 
 	if (bOffAttention)
 	{
@@ -96,9 +95,16 @@ void ASignalEmitter::EmitOffSignal()
 	}
 }
 
-void ASignalEmitter::ActiveReceivers()
+// Called every frame
+void ASignalEmitter::Tick(float DeltaTime)
 {
-	if (bActivating)
+	Super::Tick(DeltaTime);
+
+}
+
+void ASignalEmitter::ActiveReceivers() const
+{
+	if (bActive)
 	{
 		PlaySound();
 
@@ -106,9 +112,6 @@ void ASignalEmitter::ActiveReceivers()
 		{
 			receiver->ReceiveOnSignal();
 		}
-
-		bActivating = false;
-		bActivated = true;
 
 		if (bOnAttention)
 		{
@@ -125,7 +128,7 @@ void ASignalEmitter::ActiveReceivers()
 	}
 }
 
-void ASignalEmitter::InactiveReceivers()
+void ASignalEmitter::InactiveReceivers() const
 {
 	for (auto receiver : Receivers)
 	{
@@ -141,11 +144,3 @@ void ASignalEmitter::InactiveReceivers()
 		// Call reset second camera
 	}
 }
-
-// Called every frame
-void ASignalEmitter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-

@@ -15,6 +15,7 @@
 #include "ItemComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/DamageEvents.h"
+#include "Camera/CameraActor.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -96,6 +97,10 @@ void AProjectWaterCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 	//LoadData();
+
+	FTransform transform(FRotator{ .0f, -40.0f, .0f }, FVector{ .0f, .0f, 400.0f }, FVector{ 1.0f, 1.0f, 1.0f });
+	AttentionCamera = GetWorld()->SpawnActor<ACameraActor>();
+	//AttentionCamera->SetActorTransform(transform);
 }
 
 void AProjectWaterCharacter::SetEnableInput(bool b)

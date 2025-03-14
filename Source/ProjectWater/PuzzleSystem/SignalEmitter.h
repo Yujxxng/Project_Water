@@ -21,8 +21,7 @@ protected:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = Emitter, meta = (AllowPrivateAccess = "true"))
 	TArray<ASignalReceiver*> Receivers;
 
-	bool bActivating;
-	bool bActivated;
+	bool bActive;
 
 	// Attention
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = Attention, meta = (AllowPrivateAccess = "true"))
@@ -54,13 +53,12 @@ protected:
 	void EmitOnSignal();
 	void EmitOffSignal();
 
-	void ActiveReceivers();
-	void InactiveReceivers();
-
-	virtual void PlaySound() PURE_VIRTUAL(ASignalEmitter::PlaySound, );
+	virtual void PlaySound() const PURE_VIRTUAL(ASignalEmitter::PlaySound, );
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void ActiveReceivers() const;
+	void InactiveReceivers() const;
 };
