@@ -2,6 +2,7 @@
 
 #include "SignalEmitter.h"
 #include "SignalReceiver.h"
+#include "../WaterPlayerController.h"
 #include "TimerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "GameFramework/Character.h"
@@ -9,12 +10,24 @@
 
 // Sets default values
 ASignalEmitter::ASignalEmitter()
-	: PlayerMovement(nullptr)
+	: PlayerMovement(nullptr), PlayerController(nullptr)
 	, bActive(false)
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+}
+
+// Called when the game starts or when spawned
+void ASignalEmitter::BeginPlay()
+{
+	Super::BeginPlay();
+
+	auto world = GetWorld();
+	PlayerMovement = UGameplayStatics::GetPlayerCharacter(world, 0)->GetCharacterMovement();
+	PlayerController = Cast<AWaterPlayerController>(UGameplayStatics::GetPlayerController(world, 0));
+
+	InitializeAttention();
 }
 
 void ASignalEmitter::InitializeAttention()
@@ -43,13 +56,10 @@ void ASignalEmitter::InitializeAttention()
 	//UE_LOG(LogTemp, Log, TEXT("AttentionLocation %f %f %f"), AttentionLocation.X, AttentionLocation.Y, AttentionLocation.Z);
 }
 
-// Called when the game starts or when spawned
-void ASignalEmitter::BeginPlay()
+void ASignalEmitter::PlaySound() const
 {
-	Super::BeginPlay();
-	PlayerMovement = UGameplayStatics::GetPlayerCharacter(GetWorld(), 0)->GetCharacterMovement();
-
-	InitializeAttention();
+	// 사운드 변수 protected로 만들어서 하위 클래스에서 수정할 수 있게 만들어두기
+	// 사운드 출력
 }
 
 void ASignalEmitter::EmitOnSignal()
@@ -64,7 +74,7 @@ void ASignalEmitter::EmitOnSignal()
 		}
 
 		PlayerMovement->Velocity = FVector::Zero();
-		// Call set second camera
+		PlayerController->SetAttentionCamera(CameraLocation, AttentionLocation, this, true);
 	}
 	else
 	{

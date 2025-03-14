@@ -26,6 +26,6 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	void SetAttentionCamera(const FVector& Location, const FVector& Attention, const ASignalEmitter* Emitter, bool bActive);
+	void SetAttentionCamera(const FVector& CameraLocation, const FVector& AttentionLocation, const ASignalEmitter* Emitter, bool bActive);
 	void ResetAttentionCamera();
 };

@@ -8,13 +8,15 @@
 
 class ASignalReceiver;
 class UCharacterMovementComponent;
+class AWaterPlayerController;
 
 UCLASS(Abstract)
 class PROJECTWATER_API ASignalEmitter : public AActor
 {
 	GENERATED_BODY()
 
-	TObjectPtr<UCharacterMovementComponent> PlayerMovement;
+	UCharacterMovementComponent* PlayerMovement;
+	AWaterPlayerController* PlayerController;
 
 protected:
 	// Emitter
@@ -46,14 +48,14 @@ public:
 private:
 	void InitializeAttention();
 
+	void PlaySound() const;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 	void EmitOnSignal();
 	void EmitOffSignal();
-
-	virtual void PlaySound() const PURE_VIRTUAL(ASignalEmitter::PlaySound, );
 
 public:	
 	// Called every frame
