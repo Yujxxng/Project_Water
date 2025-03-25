@@ -20,6 +20,7 @@ void ASignalReceiver::BeginPlay()
 
 void ASignalReceiver::ReceiveOnSignal()
 {
+	UE_LOG(LogTemp, Log, TEXT("receive on signal"));
 	Activate();
 }
 

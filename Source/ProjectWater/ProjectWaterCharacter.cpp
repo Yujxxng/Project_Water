@@ -240,8 +240,6 @@ void AProjectWaterCharacter::MoveBlueprintTemp(FVector2D Value)
 {
 	if (Controller != nullptr)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Value %f %f"), Value.X, Value.Y);
-
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
 		const FRotator YawRotation(0, Rotation.Yaw, 0);
@@ -395,7 +393,8 @@ void AProjectWaterCharacter::Look(const FInputActionValue& Value)
 
 void AProjectWaterCharacter::Interact()
 {
-	//UE_LOG(LogTemp, Log, TEXT("AProjectWaterCharacter Interact"));
+	if (bIgnoreInput)
+		return;
 
 	TArray<AActor*> overlappingActors;
 	GetOverlappingActors(overlappingActors);

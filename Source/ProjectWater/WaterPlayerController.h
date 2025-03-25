@@ -19,13 +19,13 @@ class PROJECTWATER_API AWaterPlayerController : public APlayerController
 	
 	AProjectWaterCharacter* PlayerCharacter;
 
-	const float BlendTime = 0.75f;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:
-	void SetAttentionCamera(const FVector& CameraLocation, const FVector& AttentionLocation, const ASignalEmitter* Emitter, bool bActive);
+	const float BlendTime = 0.75f;
+
+	void SetAttentionCamera(const FVector& CameraLocation, const FVector& AttentionLocation, ASignalEmitter* Emitter, bool bActive);
 	void ResetAttentionCamera();
 };

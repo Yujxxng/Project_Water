@@ -13,14 +13,12 @@ void AWaterPlayerController::BeginPlay()
 	PlayerCharacter = Cast<AProjectWaterCharacter>(UGameplayStatics::GetPlayerCharacter(GetWorld(), 0));
 }
 
-void AWaterPlayerController::SetAttentionCamera(const FVector& CameraLocation, const FVector& AttentionLocation, const ASignalEmitter* Emitter, bool bActive)
+void AWaterPlayerController::SetAttentionCamera(const FVector& CameraLocation, const FVector& AttentionLocation, ASignalEmitter* Emitter, bool bActive)
 {
 	PlayerCharacter->SetIgnoreInput(true);
 
-	FRotator rotator = (CameraLocation - AttentionLocation).Rotation();
-	FTransform transform(rotator, CameraLocation);
-	PlayerCharacter->AttentionCamera->SetActorTransform(transform);
-
+	FRotator rotator = (AttentionLocation - CameraLocation).Rotation();
+	PlayerCharacter->AttentionCamera->SetActorLocationAndRotation(CameraLocation, rotator);
 	SetViewTargetWithBlend(PlayerCharacter->AttentionCamera, BlendTime);
 
 	FTimerHandle setAttentionHandle;
@@ -32,7 +30,7 @@ void AWaterPlayerController::SetAttentionCamera(const FVector& CameraLocation, c
 			&ASignalEmitter::ActiveReceivers,
 			BlendTime,
 			false,
-			0.f
+			BlendTime
 		);
 	}
 	else
@@ -43,13 +41,14 @@ void AWaterPlayerController::SetAttentionCamera(const FVector& CameraLocation, c
 			&ASignalEmitter::InactiveReceivers,
 			BlendTime,
 			false,
-			0.f
+			BlendTime
 		);
 	}
 }
 
 void AWaterPlayerController::ResetAttentionCamera()
 {
+	UE_LOG(LogTemp, Log, TEXT("ResetAttentionCamera"));
 	SetViewTargetWithBlend(PlayerCharacter, BlendTime);
 
 	FTimerHandle handle;

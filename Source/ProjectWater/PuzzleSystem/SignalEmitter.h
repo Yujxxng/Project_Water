@@ -23,6 +23,7 @@ protected:
 	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = Emitter, meta = (AllowPrivateAccess = "true"))
 	TArray<ASignalReceiver*> Receivers;
 
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = Emitter, meta = (AllowPrivateAccess = "true"))
 	bool bActive;
 
 	// Attention
@@ -61,6 +62,6 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void ActiveReceivers() const;
-	void InactiveReceivers() const;
+	void ActiveReceivers();
+	void InactiveReceivers();
 };

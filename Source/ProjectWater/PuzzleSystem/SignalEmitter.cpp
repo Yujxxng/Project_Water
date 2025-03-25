@@ -37,6 +37,7 @@ void ASignalEmitter::InitializeAttention()
 
 	FVector location = GetActorLocation();
 	FRotator rotator = GetActorRotation();
+	FVector scale = GetActorScale();
 	CameraLocation = location + rotator.RotateVector(CameraLocation);
 
 	if (!AttentionLocation.IsNearlyZero())
@@ -49,11 +50,15 @@ void ASignalEmitter::InitializeAttention()
 		{
 			AttentionLocation += receiver->GetActorLocation();
 		}
-		AttentionLocation /= Receivers.Num();
+		
+		if (Receivers.Num() != 0)
+			AttentionLocation /= Receivers.Num();
+		else
+			AttentionLocation = location;
 	}
-
-	//UE_LOG(LogTemp, Log, TEXT("CameraLocation %f %f %f"), CameraLocation.X, CameraLocation.Y, CameraLocation.Z);
-	//UE_LOG(LogTemp, Log, TEXT("AttentionLocation %f %f %f"), AttentionLocation.X, AttentionLocation.Y, AttentionLocation.Z);
+	
+	UE_LOG(LogTemp, Log, TEXT("CameraLocation %f %f %f"), CameraLocation.X, CameraLocation.Y, CameraLocation.Z);
+	UE_LOG(LogTemp, Log, TEXT("AttentionLocation %f %f %f"), AttentionLocation.X, AttentionLocation.Y, AttentionLocation.Z);
 }
 
 void ASignalEmitter::PlaySound() const
@@ -68,11 +73,6 @@ void ASignalEmitter::EmitOnSignal()
 
 	if (bOnAttention)
 	{
-		if (!bRepeatAttention)
-		{
-			bOnAttention = false;
-		}
-
 		PlayerMovement->Velocity = FVector::Zero();
 		PlayerController->SetAttentionCamera(CameraLocation, AttentionLocation, this, true);
 	}
@@ -112,33 +112,37 @@ void ASignalEmitter::Tick(float DeltaTime)
 
 }
 
-void ASignalEmitter::ActiveReceivers() const
+void ASignalEmitter::ActiveReceivers()
 {
-	if (bActive)
+	UE_LOG(LogTemp, Log, TEXT("ActiveReceivers bActive %d"), bActive ? 1 : 0);
+
+	PlaySound();
+
+	for (auto receiver : Receivers)
 	{
-		PlaySound();
-
-		for (auto receiver : Receivers)
-		{
-			receiver->ReceiveOnSignal();
-		}
-
-		if (bOnAttention)
-		{
-			//FTimerHandle activeReceiverHandle;
-			//GetWorld()->GetTimerManager().SetTimer(
-			//	activeReceiverHandle, this, ASignalEmitter::
-			//);
-			// Call reset second camera
-		}
+		receiver->ReceiveOnSignal();
 	}
-	else
+
+	if (bOnAttention)
 	{
-		// Call reset second camera
+		if (!bRepeatAttention)
+		{
+			bOnAttention = false;
+		}
+
+		FTimerHandle activeReceiverHandle;
+		GetWorld()->GetTimerManager().SetTimer(
+			activeReceiverHandle,
+			PlayerController,
+			&AWaterPlayerController::ResetAttentionCamera,
+			PlayerController->BlendTime,
+			false,
+			PlayerController->BlendTime
+		);
 	}
 }
 
-void ASignalEmitter::InactiveReceivers() const
+void ASignalEmitter::InactiveReceivers()
 {
 	for (auto receiver : Receivers)
 	{
@@ -147,10 +151,19 @@ void ASignalEmitter::InactiveReceivers() const
 
 	if (bOffAttention)
 	{
-		//FTimerHandle activeReceiverHandle;
-		//GetWorld()->GetTimerManager().SetTimer(
-		//	activeReceiverHandle, this, ASignalEmitter::
-		//);
-		// Call reset second camera
+		if (!bRepeatAttention)
+		{
+			bOffAttention = false;
+		}
+
+		FTimerHandle inactiveReceiverHandle;
+		GetWorld()->GetTimerManager().SetTimer(
+			inactiveReceiverHandle,
+			PlayerController,
+			&AWaterPlayerController::ResetAttentionCamera,
+			PlayerController->BlendTime,
+			false,
+			PlayerController->BlendTime
+		);
 	}
 }

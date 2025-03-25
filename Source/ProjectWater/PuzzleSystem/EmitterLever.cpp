@@ -3,12 +3,15 @@
 
 #include "EmitterLever.h"
 #include "Components/BoxComponent.h"
+#include "Curves/CurveFloat.h"
 
 // Sets default values
 AEmitterLever::AEmitterLever()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
+	Root = CreateDefaultSubobject<USceneComponent>(TEXT("Root"));
 
 	Base = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Base"));
 	Joint = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Joint"));
@@ -32,45 +35,77 @@ AEmitterLever::AEmitterLever()
 	ConstructorHelpers::FObjectFinder<UStaticMesh> wideCapsule(TEXT("/Game/StaticMeshes/SM_WideCapsule.SM_WideCapsule"));
 	Handle->SetStaticMesh(wideCapsule.Object);
 
-	RootComponent = Base;
+	RootComponent = Root;
+	Base->SetupAttachment(Root);
 	Joint->SetupAttachment(Base);
 	Arm->SetupAttachment(Joint);
 	Handle->SetupAttachment(Arm);
-	Wall1->SetupAttachment(Base);
-	Wall2->SetupAttachment(Base);
-	Box->SetupAttachment(Base);
+	Wall1->SetupAttachment(Root);
+	Wall2->SetupAttachment(Root);
+	Box->SetupAttachment(Root);
 
 	Base->SetRelativeScale3D(FVector(0.4, 0.4, 2.0));
 
 	Joint->SetRelativeScale3D(FVector(0.4, 0.4, 0.08));
-	Joint->SetRelativeLocationAndRotation(FVector(0, 0, 10), FRotator(-35, 0, 0).Quaternion());
+	Joint->SetRelativeLocationAndRotation(FVector(0, 0, 10), FRotator(Angle, 0, 0).Quaternion());
 
 	Arm->SetRelativeScale3D(FVector(0.3, 0.3, 4.8));
 
 	Handle->SetRelativeScale3D(FVector(2, 2, 0.3));
 	Handle->SetRelativeLocation(FVector(0, 0, 80));
 
-	Wall1->SetRelativeScale3D(FVector(0.75, 0.75, 0.25));
-	Wall1->SetRelativeLocationAndRotation(FVector(0, 12.5, 10), FRotator(0, 0, 90).Quaternion());
+	Wall1->SetRelativeScale3D(FVector(0.3, 0.3, 0.5));
+	Wall1->SetRelativeLocationAndRotation(FVector(0, 5, 20), FRotator(0, 0, 90).Quaternion());
 
-	Wall2->SetRelativeScale3D(FVector(0.75, 0.75, 0.25));
-	Wall2->SetRelativeLocationAndRotation(FVector(0, -12.5, 10), FRotator(0, 180, 90).Quaternion());
+	Wall2->SetRelativeScale3D(FVector(0.3, 0.3, 0.5));
+	Wall2->SetRelativeLocationAndRotation(FVector(0, -5, 20), FRotator(0, 180, 90).Quaternion());
 
-	Box->SetRelativeScale3D(FVector(4.5, 4.5, 0.9));
-	Box->SetRelativeLocation(FVector(0, 0, 30));
+	Box->SetRelativeScale3D(FVector(1.8, 1.8, 1.8));
+	Box->SetRelativeLocation(FVector(0, 0, 60));
+
+	Timeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Movement"));
+	ConstructorHelpers::FObjectFinder<UCurveFloat> curve(TEXT("/Game/Actor/PuzzleSystem/Curve_-1to1.Curve_-1to1"));
+	if (curve.Succeeded())
+	{
+		Curve = curve.Object;
+	}
+}
+
+void AEmitterLever::MoveTimeLine(float value)
+{
+	Joint->SetRelativeRotation(FRotator(Angle * value, 0, 0));
 }
 
 // Called when the game starts or when spawned
 void AEmitterLever::BeginPlay()
 {
-	Super::BeginPlay();
+	ASignalEmitter::BeginPlay();
+	
+	MoveCallback.BindUFunction(this, FName("MoveTimeLine"));
+	Timeline->AddInterpFloat(Curve, MoveCallback);
+	Timeline->SetPlayRate(2.f);
+
+	if (bActive)
+	{
+		Joint->SetRelativeRotation(FRotator(Angle, 0, 0));
+	}
+	else
+	{
+		Joint->SetRelativeRotation(FRotator(-Angle, 0, 0));
+	}
 }
 
 void AEmitterLever::Interact()
 {
 	if (!bActive)
 	{
-
+		EmitOnSignal();
+		Timeline->Play();
+	}
+	else
+	{
+		EmitOffSignal();
+		Timeline->Reverse();
 	}
 }
 
