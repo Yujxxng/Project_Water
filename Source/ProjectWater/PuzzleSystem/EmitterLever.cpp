@@ -64,7 +64,7 @@ AEmitterLever::AEmitterLever()
 	Box->SetRelativeLocation(FVector(0, 0, 60));
 
 	Timeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("Movement"));
-	ConstructorHelpers::FObjectFinder<UCurveFloat> curve(TEXT("/Game/Actor/PuzzleSystem/Curve_-1to1.Curve_-1to1"));
+	ConstructorHelpers::FObjectFinder<UCurveFloat> curve(TEXT("/Game/Curves/FloatCurve_-1to1.FloatCurve_-1to1"));
 	if (curve.Succeeded())
 	{
 		Curve = curve.Object;
