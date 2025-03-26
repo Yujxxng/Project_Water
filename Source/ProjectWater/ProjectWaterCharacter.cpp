@@ -4,15 +4,17 @@
 #include "Engine/LocalPlayer.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/AudioComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "GameFramework/Controller.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-
+#include "WaterBodyComponent.h"
 #include "CharacterState.h"
 #include "ItemComponent.h"
+#include "Kismet/KismetMathLibrary.h"
 #include "Kismet/GameplayStatics.h"
 #include "Engine/DamageEvents.h"
 #include "Camera/CameraActor.h"
@@ -67,6 +69,13 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	GetCapsuleComponent()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	//GetMesh()->SetCollisionResponseToChannel(ECollisionChannel::ECC_Camera, ECollisionResponse::ECR_Ignore);
 	
+	static ConstructorHelpers::FObjectFinder<UInputAction>IA_DescendAscend(TEXT("/Game/ThirdPerson/Input/Actions/IA_DescendAscend"));
+	if (IA_DescendAscend.Succeeded())
+	{
+		DescendAscendAction = IA_DescendAscend.Object;
+	}
+
+
 	// Create a character state
 	CharacterState = CreateDefaultSubobject<UCharacterState>(TEXT("CharacterState"));
 	CharacterCollector = CreateDefaultSubobject<UItemComponent>(TEXT("Item"));
@@ -75,6 +84,10 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	SwimEnterScene_cpp = CreateDefaultSubobject<USceneComponent>(TEXT("SwimEnterScene_cpp"));
 	SwimEnterScene_cpp->SetRelativeLocation(FVector(50.f, 0.f, 70.f));
 	SwimBuoyancyScene_cpp = CreateDefaultSubobject<USceneComponent>(TEXT("SwimBuoyancyScene_cpp"));
+
+	Swimming = false;
+	SwimSpeed = 250.f;
+	MaxSwimVelocity = 500.f;
 
 	Buoyancy_cpp = CreateDefaultSubobject<UBuoyancyComponent>(TEXT("Buoyancy_cpp"));
 	FSphericalPontoon Pontoon = FSphericalPontoon();
@@ -86,7 +99,12 @@ AProjectWaterCharacter::AProjectWaterCharacter()
 	Buoyancy_cpp->BuoyancyData.bCenterPontoonsOnCOM = true;
 	Buoyancy_cpp->BuoyancyData.Pontoons.Add(Pontoon);
 
+	////////Load Sound Asset////////
+	EnteredWaterSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Characters/Swimming/Sound/splash-water-103984"));
+	ExitWaterSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Characters/Swimming/Sound/splash-6213"));
+	AmbienceSound = LoadObject<USoundWave>(nullptr, TEXT("/Game/Characters/Swimming/Sound/underwater-ambience-6201"));
 
+	//static ConstructorHelpers::FObjectFinder<USoundWave> Ambience(TEXT("/Game/Characters/Swimming/Sound/underwater-ambience-6201"));
 	LoadData();
 }
 
@@ -97,6 +115,18 @@ void AProjectWaterCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 	//LoadData();
+
+	if (Buoyancy_cpp)
+	{
+		FScriptDelegate EnteredWaterDelegate, ExitWaterDelegate;
+		EnteredWaterDelegate.BindUFunction(this, FName("PlayEnteredWaterSound"));
+		ExitWaterDelegate.BindUFunction(this, FName("PlayExitWaterSound"));
+
+		Buoyancy_cpp->OnEnteredWaterDelegate.Add(EnteredWaterDelegate);
+		Buoyancy_cpp->OnExitedWaterDelegate.Add(ExitWaterDelegate);
+	}
+	ToggleWaterEnterCheck_CPP(true);
+
 
 	AttentionCamera = GetWorld()->SpawnActor<ACameraActor>();
 	AttentionCamera->GetCameraComponent()->bConstrainAspectRatio = false;
@@ -255,6 +285,190 @@ void AProjectWaterCharacter::MoveBlueprintTemp(FVector2D Value)
 	}
 }
 
+void AProjectWaterCharacter::PlayEnteredWaterSound(const FSphericalPontoon& Pontoon)
+{
+	if (EnteredWaterSound)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("EnteredWaterSound"));
+		float Z = GetVelocity().Z;
+		float VolumeMultiplier = MapRangeClamped(FMath::Abs(Z), 500.f, 400.f, 0.1f, 1.f);
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), EnteredWaterSound, GetActorLocation(), VolumeMultiplier, FMath::FRandRange(0.9f, 1.1f));
+	}
+}
+
+void AProjectWaterCharacter::PlayExitWaterSound(const FSphericalPontoon& Pontoon)
+{
+	if (ExitWaterSound)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("ExitWaterSound"));
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), ExitWaterSound, GetActorLocation(), 0.8f, FMath::FRandRange(0.9f, 1.1f));
+	}
+}
+
+void AProjectWaterCharacter::ToggleWaterEnterCheck_CPP(bool Enabled)
+{
+	//Either spawn or destroy the enter check actor.
+	if (Enabled)
+	{
+		if (SwimEnterScene_cpp->GetNumChildrenComponents() > 0)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Spawn Actor"));
+			SwimEnterScene_cpp->GetChildComponent(0)->DestroyComponent();
+
+			FTransform NewTransform;
+			NewTransform.SetScale3D(FVector(0.2f, 0.2f, 0.2f));
+			SwimActorEnterCheck = GetWorld()->SpawnActorDeferred<ASwimActorEnterCheck>(ASwimActorEnterCheck::StaticClass(), NewTransform, this, nullptr);
+		
+			SwimActorEnterCheck->AttachToComponent(SwimEnterScene_cpp, FAttachmentTransformRules(EAttachmentRule::SnapToTarget, EAttachmentRule::KeepRelative, EAttachmentRule::KeepRelative, true));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Destroy Actor"));
+		SwimEnterScene_cpp->GetChildComponent(0)->GetOwner()->Destroy();
+	}
+}
+
+void AProjectWaterCharacter::ToggleUnderwaterAmbience_CPP(bool Enabled)
+{
+	//Control whether the underwater ambience is currently playing. using fades to make it blend in and out.
+	if (Enabled)
+	{
+		if(!IsValid(UnderwaterAmbience))
+		{
+			UnderwaterAmbience = UGameplayStatics::SpawnSoundAttached(AmbienceSound, this->GetMesh());
+			UnderwaterAmbience->FadeIn(0.2f);
+		}
+	}
+	else
+	{
+		if (IsValid(UnderwaterAmbience))
+		{
+			UnderwaterAmbience->FadeOut(0.4f, 0.f);
+		}
+	}
+}
+
+void AProjectWaterCharacter::SwimmingBuoyancy_CPP(float SurfaceBuoyancyZCorrection, float InterpSpeed)
+{
+	//When the player is at the water surface, since the character is not a physics object, the buoyancy component won't make them move with the waves, so this uses the buoyancy actor to fake it.
+	switch (SwimMode_CPP)
+	{
+	case SwimMode_Enum::Treading:
+	case SwimMode_Enum::SurfaceSwimming:
+		if (InputSubSystem->GetPlayerInput()->GetActionValue(DescendAscendAction).Get<float>() > 1.f)
+		{
+			if (IsValid(SwimBuoyancyActor))
+			{
+				float A = SwimBuoyancyActor->cubeMeshComponent->GetComponentLocation().Z;
+		
+				bool bSelectA = GetVelocity().Length() > 2.0;
+				float B = UKismetMathLibrary::SelectFloat(0.5f, 1.0f, bSelectA) * SurfaceBuoyancyZCorrection;
+				
+				
+				SetActorLocation(UKismetMathLibrary::VInterpTo(GetActorLocation(), FVector(GetActorLocation().X, GetActorLocation().Y, (A - B)), GetWorld()->GetDeltaSeconds(), InterpSpeed));
+			}
+		}
+		break;
+	case SwimMode_Enum::UnderwaterIdle:
+		break;
+	case SwimMode_Enum::UnderwaterSwimming:
+		break;
+	default:
+		break;
+	}
+}
+
+void AProjectWaterCharacter::ExitSwimTrace_CPP(float UpOffset, float DownOffset, float MaxDepth)
+{
+	FHitResult HitResult;
+	FVector Start = GetMesh()->GetSocketLocation(FName("head")) + FVector(10.f, 10.f, UpOffset);
+	FVector End = GetMesh()->GetSocketLocation(FName("head")) - FVector(10.f, 10.f, DownOffset);
+	FCollisionQueryParams Params;
+	Params.AddIgnoredActor(this);
+
+	//UE_LOG(LogTemp, Warning, TEXT("Sphere Trace"));
+	if (Buoyancy_cpp->GetCurrentWaterBodyComponents().IsEmpty())
+	{
+		if (Buoyancy_cpp->GetCurrentWaterBodyComponents().IsValidIndex(0))
+		{
+			auto WaterBody = Buoyancy_cpp->GetCurrentWaterBodyComponents().GetData()->Get();
+			FVector VTemp;
+			float OutWaterDepth;
+			WaterBody->GetWaterSurfaceInfoAtLocation(GetActorLocation(), VTemp, VTemp, VTemp, OutWaterDepth, true);
+			bool bTrace = GetWorld()->SweepSingleByChannel(HitResult, Start, End, FQuat::Identity, ECC_Visibility, FCollisionShape::MakeSphere(25.f), Params);
+			if (bTrace && (OutWaterDepth < MaxDepth))
+			{
+				//If the player close to the ground and the water depth is low enough (meaning there is air above them), then swimming will end.
+				EndSwimming();
+			}
+			else {}
+		}
+
+	}
+
+}
+
+void AProjectWaterCharacter::EventStartSwimming_CPP()
+{
+	//Start swimming and spawn buoyancy object.
+	if (!Swimming)
+	{
+		Swimming = true;
+		ToggleWaterEnterCheck_CPP(false);
+		CMC->SetMovementMode(MOVE_Flying);
+		CMC->MaxFlySpeed = SwimSpeed;
+		CMC->bOrientRotationToMovement = false;
+		ToggleUnderwaterAmbience_CPP(true);
+
+		SwimHorizontal = UKismetMathLibrary::MakeRotFromX(GetActorForwardVector());
+		
+		FTransform NewTransform;
+		NewTransform.SetLocation(SwimEnterScene_cpp->GetComponentLocation());
+		SwimBuoyancyActor = GetWorld()->SpawnActorDeferred<ASwimmingBuoyancy>(ASwimmingBuoyancy::StaticClass(), NewTransform, nullptr, this);
+
+		GetWorldTimerManager().SetTimer(SwimmingTimerHandle, this, &AProjectWaterCharacter::SwimmingTick, 0.01f, true, 0.f);
+	}
+}
+
+void AProjectWaterCharacter::SwimmingTick()
+{
+
+	//Timer that sets the swim mode value, calls the function and limits the max velocity (so if the player enters the water with a higher velocity, it won't float at a fast speed.
+	//Sequence 0
+	bool bIndex = GetVelocity().Length() > 10.f;
+	if (Buoyancy_cpp->IsInWaterBody())
+	{
+		if (bIndex)
+			SwimMode_CPP = SwimMode_Enum::UnderwaterSwimming;
+		else
+			SwimMode_CPP = SwimMode_Enum::UnderwaterIdle;
+	}
+	else
+	{
+		if (bIndex)
+			SwimMode_CPP = SwimMode_Enum::SurfaceSwimming;
+		else
+			SwimMode_CPP = SwimMode_Enum::Treading;
+	}
+	SwimBuoyancyActor->SetXYPosition();
+
+
+	//Sequence 1
+	SwimmingBuoyancy_CPP();
+
+	//Sequence 2
+	ExitSwimTrace_CPP();
+
+	//Sequence 3
+	ToggleUnderwaterAmbience_CPP(SwimMode_CPP != SwimMode_Enum::Treading);
+	if (GetVelocity().Length() > MaxSwimVelocity)
+	{
+		CMC->Velocity = GetVelocity().GetClampedToSize(0.0f, MaxSwimVelocity);
+	}
+
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Input
 
@@ -285,6 +499,8 @@ void AProjectWaterCharacter::SetupPlayerInputComponent(UInputComponent* PlayerIn
 
 		// Interacting
 		EnhancedInputComponent->BindAction(InteractAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::Interact);
+
+		EnhancedInputComponent->BindAction(DescendAscendAction, ETriggerEvent::Triggered, this, &AProjectWaterCharacter::DescendAscend);
 	}
 	else
 	{
@@ -388,6 +604,13 @@ void AProjectWaterCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}
+}
+
+void AProjectWaterCharacter::DescendAscend(const FInputActionValue& Value)
+{
+	//Value = Axis1D(Float)
+
+	UE_LOG(LogTemp, Warning, TEXT("AProjectWaterCharacter DescendAscend"));
 }
 
 void AProjectWaterCharacter::Interact()
