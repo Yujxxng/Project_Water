@@ -9,7 +9,7 @@
 #include "BuoyancyComponent.h"
 #include <chrono>
 #include "MyUtils.h"
-#include "Interact.h"
+#include "PuzzleSystem/Interact.h"
 #include "PuzzleSystem/Interact.h"
 #include "Swimming/SwimmingBuoyancy.h"
 #include "Swimming/EnumSwimMode.h"
