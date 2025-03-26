@@ -8,7 +8,11 @@
 #include "WaterGameInstance.h"
 #include "BuoyancyComponent.h"
 #include <chrono>
+#include "MyUtils.h"
 #include "Interact.h"
+#include "Swimming/SwimmingBuoyancy.h"
+#include "Swimming/EnumSwimMode.h"
+#include "Swimming/SwimActorEnterCheck.h"
 #include "Swimming/WaterInteraction.h"
 #include "ProjectWaterCharacter.generated.h"
 
@@ -21,6 +25,7 @@ struct FInputActionValue;
 class UCharacterState;
 class UItemComponent;
 class UEnhancedInputLocalPlayerSubsystem;
+//enum class SwimMode_Enum;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -53,9 +58,13 @@ class AProjectWaterCharacter : public ACharacter, public IInteract, public IWate
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
-	/** Look Input Action */
+	/** Interact Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* InteractAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DescendAscendAction;
+
 
 public:
 	AProjectWaterCharacter();
@@ -70,6 +79,7 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
+	void DescendAscend(const FInputActionValue& Value);
 	void Interact() override;
 
 
@@ -87,14 +97,23 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 
-	//////////////////////////////////////////////////////////////////////////
-	// Custom
+	///////////////////////////////Swimming///////////////////////////////////////////
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Swim, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* SwimEnterScene_cpp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Swim, meta = (AllowPrivateAccess = "true"))
 	USceneComponent* SwimBuoyancyScene_cpp;
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Swim, meta = (AllowPrivateAccess = "true"))
 	UBuoyancyComponent* Buoyancy_cpp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Swim, meta = (AllowPrivateAccess = "true"))
+	ASwimActorEnterCheck* SwimActorEnterCheck;
+	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Swimming", meta = (AllowPrivateAccess = "true"))
+	SwimMode_Enum SwimMode_CPP;
+	ASwimmingBuoyancy* SwimBuoyancyActor;
+	bool Swimming;
+	float SwimSpeed;
+	float MaxSwimVelocity;
+	FRotator SwimHorizontal;
+	FTimerHandle SwimmingTimerHandle;
 
 private:
 	TObjectPtr<UCharacterMovementComponent> CMC;
@@ -124,6 +143,20 @@ private:
 	const std::chrono::duration<long, std::milli> OxygenCheckInterval;
 	std::chrono::system_clock::time_point UseOxygenStart;
 
+
+public:
+
+	/////Sound
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	TObjectPtr<USoundWave> EnteredWaterSound;
+
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	TObjectPtr<USoundWave> ExitWaterSound;
+	UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	TObjectPtr<USoundWave> AmbienceSound;
+	//UPROPERTY(BlueprintReadWrite, EditDefaultsOnly)
+	UAudioComponent* UnderwaterAmbience;
+
 public:
 	virtual void Jump() override;
 	virtual void StopJumping() override;
@@ -132,6 +165,7 @@ public:
 	UCharacterState* CharacterState;
 	UPROPERTY(VisibleDefaultsOnly, BlueprintReadOnly, Category = "Item", meta = (AllowPrivateAccess = "true"))
 	UItemComponent* CharacterCollector;
+
 
 	UFUNCTION(BlueprintCallable)
 	void SetEnableInput(bool b);
@@ -180,8 +214,17 @@ public:
 	void MoveBlueprintTemp(FVector2D Value);
 
 
-	///////////////////Swimming////////////////////
+	//////////////////////////////////////////Swimming////////////////////////////////////////////////////
 	UFUNCTION()
-	void Delegate_Test(const FSphericalPontoon& Pontoon);
+	void PlayEnteredWaterSound(const FSphericalPontoon& Pontoon);
+	UFUNCTION()
+	void PlayExitWaterSound(const FSphericalPontoon& Pontoon);
+	UFUNCTION(BlueprintCallable)
+	void ToggleWaterEnterCheck_CPP(bool Enabled);
+	void ToggleUnderwaterAmbience_CPP(bool Enabled);
+	void SwimmingBuoyancy_CPP(float SurfaceBuoyancyZCorrection = 50.f, float InterpSpeed = 10.f);
+	void ExitSwimTrace_CPP(float UpOffset = 25.f, float DownOffset = 25.f, float MaxDepth = 100.f);
+	void EventStartSwimming_CPP();
+	void SwimmingTick();
 };
 

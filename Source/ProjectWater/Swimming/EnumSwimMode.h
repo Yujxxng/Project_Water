@@ -6,8 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "EnumSwimMode.generated.h"
 
-
-enum class SwimMode_Enum
+UENUM(BlueprintType)
+enum class SwimMode_Enum : uint8
 {
 	Treading,
 	SurfaceSwimming,

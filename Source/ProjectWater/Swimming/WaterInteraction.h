@@ -6,7 +6,7 @@
 #include "UObject/Interface.h"
 #include "WaterInteraction.generated.h"
 
-enum class SwimMode_Enum;
+//enum class SwimMode_Enum;
 enum class WaterInteractionBones_Enum;
 // This class does not need to be modified.
 UINTERFACE(MinimalAPI)

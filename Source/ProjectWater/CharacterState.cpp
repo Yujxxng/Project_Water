@@ -24,7 +24,7 @@ UCharacterState::UCharacterState()
 	PrimaryComponentTick.bCanEverTick = true;
 
 	SetState(EState::STATE_Human);
-
+	
 	LockedState[0] = true;
 	LockedState[1] = true;
 	LockedState[2] = true;
